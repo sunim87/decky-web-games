@@ -1,0 +1,13 @@
+{
+  "name": "Pokebonk Installer",
+  "author": "sunim87",
+  "flags": [],
+  "api_version": 1,
+  "publish": {
+    "tags": [
+      "utility"
+    ],
+    "description": "포켓봉크 공식 웹게임 설치·제거. Brave, Steam Input 및 라이브러리 이미지 자동 설정.",
+    "image": ""
+  }
+}

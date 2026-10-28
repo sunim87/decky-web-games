@@ -1,0 +1,35 @@
+{
+  "name": "decky-pokebonk",
+  "version": "1.0.4",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "typecheck": "tsc --noEmit",
+    "test": "python -m unittest discover -s tests -v"
+  },
+  "dependencies": {
+    "@decky/api": "1.1.3",
+    "tslib": "2.8.1"
+  },
+  "devDependencies": {
+    "@decky/rollup": "1.0.2",
+    "@decky/ui": "4.11.0",
+    "@types/react": "19.1.1",
+    "@types/react-dom": "19.1.1",
+    "rollup": "4.53.3",
+    "typescript": "5.6.3"
+  },
+  "author": "sunim87",
+  "description": "Decky Loader installer for Pokebonk Online with native gamepad controls and Steam artwork",
+  "license": "MIT",
+  "homepage": "https://github.com/sunim87/decky-pokebonk#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sunim87/decky-pokebonk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sunim87/decky-pokebonk/issues"
+  },
+  "packageManager": "pnpm@11.25.0"
+}
