@@ -1,11 +1,9 @@
 # Changelog
 
-## 1.0.5
+## 1.0.4
 
 - Expose `/run/udev` read-only when launching Brave so Chromium can identify Steam Input's virtual gamepad.
 - Existing installations need Install again to refresh launch options, followed by a full game restart.
-
-## 1.0.4
 
 - Use Steam's native gamepad template instead of WASD/mouse conversion.
 - Select the built-in Steam Deck controller by its actual controller index.

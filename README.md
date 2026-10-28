@@ -83,6 +83,6 @@ Installer code is [MIT licensed](LICENSE). This does not grant rights to Pokémo
 
 ## Gamepad detection / 게임패드 인식
 
-v1.0.5 launches Brave with read-only `/run/udev` access, which Chromium needs to identify the virtual gamepad. After updating, press **Install** again and fully close/relaunch the game. Press a gamepad button while the game is focused.
+v1.0.4 launches Brave with read-only `/run/udev` access, which Chromium needs to identify the virtual gamepad. After updating, press **Install** again and fully close/relaunch the game. Press a gamepad button while the game is focused.
 
-업데이트 후 **Install**을 다시 누르고 게임을 완전히 종료한 뒤 재실행하세요. 게임 화면에서 게임패드 버튼을 한 번 누르세요. v1.0.5는 게임패드 식별에 필요한 `/run/udev` 읽기 권한을 실행 옵션에 포함합니다.
+업데이트 후 **Install**을 다시 누르고 게임을 완전히 종료한 뒤 재실행하세요. 게임 화면에서 게임패드 버튼을 한 번 누르세요. v1.0.4는 게임패드 식별에 필요한 `/run/udev` 읽기 권한을 실행 옵션에 포함합니다.
