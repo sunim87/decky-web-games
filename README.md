@@ -80,3 +80,9 @@ The package script writes the install ZIP next to the repository directory. See 
 This is an unofficial community installer, not an official game distribution. PokéBonk is by Charcher and is loaded from its official website. No game code or unlocked offline edition is included. The PB icon originates from the game's bundled icon; capsule, hero and wordmark artwork was generated with ImageGen. The controller profile is based on Steam's standard gamepad template.
 
 Installer code is [MIT licensed](LICENSE). This does not grant rights to Pokémon characters, trademarks, game artwork or third-party assets. Not affiliated with Charcher, Valve, Nintendo, GAME FREAK, Creatures or The Pokémon Company.
+
+## Gamepad detection / 게임패드 인식
+
+v1.0.5 launches Brave with read-only `/run/udev` access, which Chromium needs to identify the virtual gamepad. After updating, press **Install** again and fully close/relaunch the game. Press a gamepad button while the game is focused.
+
+업데이트 후 **Install**을 다시 누르고 게임을 완전히 종료한 뒤 재실행하세요. 게임 화면에서 게임패드 버튼을 한 번 누르세요. v1.0.5는 게임패드 식별에 필요한 `/run/udev` 읽기 권한을 실행 옵션에 포함합니다.

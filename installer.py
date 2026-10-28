@@ -10,7 +10,7 @@ import struct
 ROOT = Path(__file__).resolve().parent
 NAME = "Pokebonk Online"
 BRAVE = "com.brave.Browser"
-OPTIONS = "run --branch=stable --arch=x86_64 --command=brave com.brave.Browser --no-first-run --no-default-browser-check --ozone-platform=x11 --kiosk --force-device-scale-factor=1.25 --enable-features=OverlayScrollbar https://pokebonk.com/"
+OPTIONS = "run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave com.brave.Browser --no-first-run --no-default-browser-check --ozone-platform=x11 --kiosk --force-device-scale-factor=1.25 --enable-features=OverlayScrollbar https://pokebonk.com/"
 
 
 def read_shortcuts(data):

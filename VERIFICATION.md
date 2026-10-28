@@ -21,3 +21,7 @@ Steam/Decky internal APIs and the online game may change independently of this p
 ## 한국어 요약
 
 실제 스팀덱에서 설치·제거·재설치, Brave 및 브라우저 프로필 보존, 공식 웹게임 실행, 이미지 적용, 네이티브 게임패드 프로필 선택을 확인했습니다. 테스트 15개와 타입 검사·빌드를 통과했습니다. 장시간 이동 고정 재발 여부, 모든 물리 버튼, 외부 패드 및 다른 기기는 완전 검증하지 않았습니다.
+
+## v1.0.5 device visibility
+
+On the affected Steam Deck, Steam Input reported a selected gamepad-only profile and created a virtual Xbox controller. Brave could read its event device but could not read `/run/udev/data`. Adding read-only udev access made `ID_INPUT_JOYSTICK=1` visible inside the Flatpak sandbox. End-to-end in-game input still requires a full browser restart and physical input confirmation.
