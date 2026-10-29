@@ -25,3 +25,10 @@ Steam/Decky internal APIs and the online game may change independently of this p
 ## v1.0.4 device visibility
 
 On the affected Steam Deck, Steam Input reported a selected gamepad-only profile and created a virtual Xbox controller. Brave could read its event device but could not read `/run/udev/data`. Adding read-only udev access made `ID_INPUT_JOYSTICK=1` visible inside the Flatpak sandbox. After a full browser restart, the user confirmed that in-game gamepad input works normally.
+## v1.1.0
+
+- 23 Python regression tests passed, including independent game records, profile preservation, cross-game artwork rejection and exact URL identity.
+- Frontend simulated Steam/Decky tests passed for installing both games, separate artwork routes, native controller selection, isolated uninstall and rollback after controller setup failure.
+- TypeScript typecheck and production build passed.
+- Official Azeroth v0.127.0 menu and native gamepad settings were observed in a desktop browser.
+- Physical Steam Deck Gaming Mode: test plugin installed, Azeroth shortcut created (separate from Pokebonk), all four library artwork hashes verified, native gamepad-only template selected, and AMD RDNA 2 WebGPU adapter initialized. Official game menu rendered. Installation/removal is blocked while the game runs. The user confirmed physical gamepad controls working; world rendering, uninstall/reinstall, preserved browser data and unchanged local storage hashes across reinstall were verified. A first-run Brave analytics infobar was reproduced and fixed by disabling P3A and acknowledging its notice in the dedicated game profile. Long-session performance and stability remain untested.

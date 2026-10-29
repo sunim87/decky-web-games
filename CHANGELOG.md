@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0
+
+- Add Azeroth Survivors alongside Pokebonk, with separate Install/Uninstall buttons.
+- Keep each game's manifests, controller profiles and artwork separate.
+- Launch Azeroth with a dedicated Brave profile, read-only gamepad identification access and Linux WebGPU/Vulkan options.
+- Disable Brave P3A and its first-run infobar in the dedicated Azeroth profile.
+- Add generated capsule, wide capsule, hero, transparent logo and icon for Azeroth.
+- Preserve both games' browser data when uninstalling either shortcut.
+- Add multi-game isolation and frontend rollback tests. Physical Steam Deck launch, gamepad and uninstall/reinstall validated; long-session testing pending.
+
 ## 1.0.4
 
 - Expose `/run/udev` read-only when launching Brave so Chromium can identify Steam Input's virtual gamepad.
@@ -10,13 +20,8 @@
 - Pass Steam's configuration selection type and verify gamepad-only input.
 - Preserve an existing profile backup.
 
-## 1.0.3
-
-- Preserve mixed-case Pokebonk Online in both panel titles.
-
 ## 1.0.2
 
-- English titles and Install/Uninstall buttons.
 - Korean and English status messages on separate lines.
 
 ## 1.0.1

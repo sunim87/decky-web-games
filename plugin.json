@@ -1,5 +1,5 @@
 {
-  "name": "Pokebonk Installer",
+  "name": "Decky Web Games",
   "author": "sunim87",
   "flags": [],
   "api_version": 1,
@@ -7,7 +7,7 @@
     "tags": [
       "utility"
     ],
-    "description": "포켓봉크 공식 웹게임 설치·제거. Brave, Steam Input 및 라이브러리 이미지 자동 설정.",
+    "description": "Pokebonk Online · Azeroth Survivors 웹게임 설치·제거. 게임패드와 라이브러리 이미지 자동 설정.",
     "image": ""
   }
 }

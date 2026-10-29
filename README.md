@@ -1,88 +1,76 @@
-# Pokebonk Online for Decky Loader
+# Decky Web Games
 
-[한국어](#한국어) · [English](#english) · [Download / 다운로드](https://github.com/sunim87/decky-pokebonk/releases/latest)
+Steam Deck용 웹게임 설치·제거 플러그인 / Web game launcher for Decky Loader.
 
-![Pokebonk Online artwork](assets/wide.png)
+![Azeroth Survivors library artwork](assets/azeroth/wide.png)
 
 ## 한국어
 
-Steam Deck에서 공식 웹게임 [PokéBonk](https://pokebonk.com/)을 설치·제거하는 비공식 Decky Loader 플러그인입니다. **Install / Uninstall** 두 버튼과 한국어·영어 상태 안내를 제공합니다.
+**Pokebonk Online**과 **Azeroth Survivors**를 게임별 **Install / Uninstall** 버튼으로 관리합니다. Install을 누르면 Brave 브라우저 준비, Steam 바로가기, 네이티브 게임패드 설정과 라이브러리 이미지 등록을 진행합니다. 인터넷 연결이 필요합니다.
+
+| 게임 | 공식 사이트 | 실행 방식 |
+| --- | --- | --- |
+| Pokebonk Online | https://pokebonk.com/ | Brave 전체화면 |
+| Azeroth Survivors | https://wow.aethus.pl/ | 전용 Brave 프로필 · WebGPU/Vulkan |
 
 ### 설치
 
-1. [최신 릴리스](https://github.com/sunim87/decky-pokebonk/releases/latest)에서 `decky-pokebonk-v1.0.4.zip`을 다운로드합니다.
-2. Decky Loader 설정의 개발자 메뉴에서 ZIP 설치 기능으로 파일을 선택합니다. 필요하면 Decky 개발자 모드를 켭니다.
-3. Decky에서 **Pokebonk Installer**를 열고 **Install**을 누릅니다.
-4. Steam 라이브러리의 **Pokebonk Online**을 실행합니다.
+1. [릴리스 페이지](https://github.com/sunim87/decky-web-games/releases/latest)에서 **decky-web-games-v1.1.0.zip**을 다운로드합니다. `-source.zip`은 소스 코드 보관용입니다.
+2. Decky Loader 설정의 개발자 메뉴에서 ZIP 설치 기능으로 설치합니다.
+3. Decky에서 **Decky Web Games**를 열고 원하는 게임의 **Install**을 누릅니다.
+4. Steam 라이브러리에서 해당 게임을 실행합니다.
 
-Brave가 없으면 공식 Flathub에서 사용자 권한으로 설치하며 기존 설치가 있으면 재사용합니다. 전체화면·X11·배율 1.25, Steam 바로가기, 게임패드 설정, 캡슐·넓은 캡슐·히어로·로고·아이콘을 함께 등록합니다. 로그인이나 게스트 시작은 게임에서 직접 선택합니다.
+기존 Brave가 있으면 재사용하며 없으면 공식 Flathub에서 설치합니다. 게임별 캡슐·넓은 캡슐·히어로·로고·아이콘을 등록합니다. 첫 실행 시 게임 데이터를 내려받는 동안 시간이 걸릴 수 있습니다.
 
-인터넷 연결, Decky Loader가 설치된 SteamOS 게이밍 모드와 Steam Deck 내장 컨트롤러가 필요합니다.
+### 조작 및 실행
 
-### 조작
+Steam Deck 내장 컨트롤러에 네이티브 게임패드 설정을 적용합니다. 게임패드 식별에 필요한 `/run/udev` 읽기 권한도 실행 옵션에 포함합니다. 게임 화면이 활성화된 상태에서 버튼을 한 번 누르세요.
 
-| 입력 | 전달되는 동작 |
-| --- | --- |
-| 왼쪽 스틱 | 왼쪽 아날로그 축 / 이동 |
-| 오른쪽 스틱 | 오른쪽 아날로그 축 / 카메라 |
-| A/B/X/Y, LT/RT, LB/RB, 방향 패드 | 해당 게임패드 버튼 |
-| 메뉴 / 보기 버튼 | Start / Select |
+Azeroth는 왼쪽 스틱 이동, 오른쪽 스틱 시점 회전, A 점프, 범퍼·트리거 확대/축소를 지원합니다. 자세한 버튼 동작은 각 게임의 설정을 확인하세요.
 
-Steam 표준 게임패드 템플릿을 사용하며 WASD나 마우스로 변환하지 않습니다. 세부 버튼 기능은 게임 내 게임패드 설정을 따릅니다. 이동 고정 증상의 장시간 재발 여부와 모든 버튼의 실제 플레이 검증은 아직 완료하지 않았습니다.
+Azeroth는 WebGPU용 Linux 그래픽 옵션과 별도 브라우저 프로필을 사용합니다. 전용 프로필에서는 Brave P3A 통계와 첫 실행 안내를 비활성화합니다. 일반 Brave 프로필은 변경하지 않습니다.
 
-### 제거 및 데이터 보존
+### 제거 및 데이터
 
-**Uninstall**은 설치 기록에 있는 바로가기와 라이브러리 이미지를 제거합니다. **Brave, 브라우저 프로필, 로그인, 게임 저장 데이터, 기존 오프라인판과 다른 게임은 보존**합니다. 설치 전 조작 설정이 있으면 복원하며, 사용자가 변경한 프로필은 보존합니다. 실행 중인 게임은 먼저 종료해야 합니다.
+게임을 종료한 뒤 해당 게임의 **Uninstall**을 누르세요. 관리 중인 바로가기와 라이브러리 이미지를 제거하며 **Brave, 로그인, 브라우저 프로필과 게임 저장 데이터는 보존**합니다. 다른 게임은 제거하지 않습니다.
 
-다른 내용의 동명 바로가기는 변경하지 않습니다. 기존 수동 바로가기에 `FlatpakAppID` 정보가 있으면 Steam이 Brave까지 제거할 수 있어 자동 제거를 중단합니다. 이 플러그인이 새로 생성하는 바로가기에는 해당 정보를 넣지 않습니다.
-
-Decky에서 플러그인 자체를 삭제하는 것과 게임 바로가기 제거는 별개입니다. 게임도 제거하려면 먼저 **Uninstall**을 누르세요. 설치 기록과 복구용 프로필은 `~/.local/share/decky-pokebonk/`에 보관됩니다.
+Decky에서 플러그인만 삭제하면 게임 바로가기는 남습니다. 바로가기까지 지우려면 먼저 Uninstall을 실행하세요. 기존 설치 기록은 `~/.local/share/decky-pokebonk/`에 유지하며 Azeroth 기록은 그 아래 `azeroth/`에 저장합니다.
 
 ## English
 
-An unofficial Decky Loader plugin that installs the official [PokéBonk web game](https://pokebonk.com/) as a non-Steam shortcut. The panel has **Install / Uninstall** buttons and Korean/English status messages.
+Install and uninstall **Pokebonk Online** and **Azeroth Survivors** from Decky. Each game has its own buttons, Steam shortcut, native gamepad setup and five library images. Games load directly from their creators' websites and require internet access.
 
-### Install
+Download **decky-web-games-v1.1.0.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
 
-1. Download `decky-pokebonk-v1.0.4.zip` from the [latest release](https://github.com/sunim87/decky-pokebonk/releases/latest).
-2. Install the ZIP through Decky Loader's developer settings. Enable developer mode if needed.
-3. Open **Pokebonk Installer** in Decky and select **Install**.
-4. Launch **Pokebonk Online** from your Steam library.
+Brave is reused or installed from Flathub. Azeroth uses a dedicated profile with Linux WebGPU/Vulkan options and read-only `/run/udev` access. Its P3A notice is disabled in that dedicated profile. Browser sandboxing and certificate checks stay enabled.
 
-The installer reuses Brave or installs it from the official Flathub repository in user scope. It sets up kiosk mode, X11, scale factor 1.25, native Steam Deck gamepad controls, and all five Steam artwork roles. Choose guest play or sign in yourself inside the game.
+Close the game before pressing **Uninstall**. Only the managed shortcut and library art are removed. Brave, browser profiles, login sessions, game saves and other games are kept. Removing the Decky plugin itself does not remove shortcuts.
 
-Requires an internet connection, SteamOS Gaming Mode, Decky Loader and the built-in Steam Deck controller. Native gamepad controls follow the game's bindings; movement is not converted to WASD or mouse input. Long-session input stability and every physical button have not been fully play-tested.
+## Validation
 
-### Uninstall
-
-**Uninstall** removes the managed shortcut and its library artwork. **Brave, browser profiles, login sessions, game saves, offline builds and other games are kept.** Pre-existing controller profiles are restored when unchanged; user-edited profiles are preserved. Close the game first.
-
-Unrelated shortcuts are not modified. Removal is blocked if a manually created shortcut contains `FlatpakAppID` metadata that could cause Steam to uninstall Brave. New shortcuts created by this plugin do not contain that metadata.
-
-Removing the plugin from Decky does not remove the game shortcut. Use **Uninstall** first if you also want to remove it. Persistent installation records and profile backups are stored in `~/.local/share/decky-pokebonk/`.
+- 23 Python regression tests, frontend installation/rollback tests, typecheck and build passed.
+- Physical Steam Deck Gaming Mode launch, AMD RDNA 2 WebGPU initialization, artwork, native gamepad selection and user-confirmed controls were tested.
+- Uninstall/reinstall preserved the browser profile and local storage hashes; existing Pokebonk stayed available.
+- Brave first-run infobar fix was verified after relaunch.
+- Long-session stability, every physical button, external controllers and other hardware are not fully tested. See [VERIFICATION.md](VERIFICATION.md).
 
 ## Development
 
-Node.js 20+, pnpm 11.25.0, Python 3.11+:
+Node.js 20+, pnpm 11.25.0 and Python 3.11+:
 
 ```sh
 pnpm install --frozen-lockfile
+pnpm test
+pnpm test:frontend
 pnpm typecheck
 pnpm build
-python -m unittest discover -s tests -v
 python scripts/package_plugin.py
 ```
 
-The package script writes the install ZIP next to the repository directory. See [CHANGELOG.md](CHANGELOG.md) and [VERIFICATION.md](VERIFICATION.md) for changes and testing limits. Steam/Decky internal APIs and the online game may change independently of this plugin.
+The install ZIP retains the existing `decky-pokebonk/` plugin directory and persistent data paths for updates. Steam/Decky internal APIs, games and browser behavior may change independently.
 
 ## Credits and license
 
-This is an unofficial community installer, not an official game distribution. PokéBonk is by Charcher and is loaded from its official website. No game code or unlocked offline edition is included. The PB icon originates from the game's bundled icon; capsule, hero and wordmark artwork was generated with ImageGen. The controller profile is based on Steam's standard gamepad template.
+PokéBonk is by Charcher; Azeroth Survivors is by Aethus. This plugin opens their official sites and does not redistribute game code or unlocked offline builds. Generated library artwork is fan artwork, not an official game screenshot. The Pokebonk PB icon originates from the game's bundled icon; the controller template is based on Steam's standard gamepad template.
 
-Installer code is [MIT licensed](LICENSE). This does not grant rights to Pokémon characters, trademarks, game artwork or third-party assets. Not affiliated with Charcher, Valve, Nintendo, GAME FREAK, Creatures or The Pokémon Company.
-
-## Gamepad detection / 게임패드 인식
-
-v1.0.4 launches Brave with read-only `/run/udev` access, which Chromium needs to identify the virtual gamepad. After updating, press **Install** again and fully close/relaunch the game. Press a gamepad button while the game is focused.
-
-업데이트 후 **Install**을 다시 누르고 게임을 완전히 종료한 뒤 재실행하세요. 게임 화면에서 게임패드 버튼을 한 번 누르세요. v1.0.4는 게임패드 식별에 필요한 `/run/udev` 읽기 권한을 실행 옵션에 포함합니다.
+Plugin code is [MIT licensed](LICENSE); this does not grant rights to game characters, artwork or trademarks. Unofficial community project, not affiliated with the game developers, Valve, Blizzard Entertainment, Nintendo, GAME FREAK, Creatures or The Pokémon Company.
