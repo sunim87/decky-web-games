@@ -115,3 +115,38 @@ class MultiGameTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(base64.b64decode(az['assets'][0]['data']), (self.az.assets / 'icon.png').read_bytes())
         self.assertFalse((await plugin.get_artwork('../icon', 'azeroth'))['ok'])
         self.assertFalse((await plugin.get_artwork('icon', '../azeroth'))['ok'])
+
+    async def test_d2_installs_and_uninstalls_without_touching_other_games(self):
+        d2 = Installer(self.home, game='d2')
+        d2.ensure_brave = AsyncMock()
+        for backend, appid in [(self.pb,0x80000001),(self.az,0x80000002)]:
+            await backend.prepare_install('123')
+            await backend.finish_install('123',appid)
+        saved = {p:p.read_bytes() for p in [self.pb.manifest('123'),self.az.manifest('123'),self.pb.profile('123'),self.az.profile('123')]}
+        result = await d2.prepare_install('123')
+        options = shlex.split(result['options'])
+        self.assertEqual(result['name'],'D2 Survivors')
+        self.assertEqual(options[-1],'https://d2survivors.lol/play/')
+        self.assertNotIn('--enable-unsafe-webgpu',options)
+        self.assertIn('--filesystem=/run/udev:ro',options)
+        self.assertIn('--lang=ko',options)
+        self.assertIn('--accept-lang=ko-KR,ko,en-US,en',options)
+        self.assertNotIn('--lang=ko',shlex.split(self.az.launch_options()))
+        self.assertNotEqual(d2.browser_profile(),self.az.browser_profile())
+        prefs=json.loads((d2.browser_profile()/'Local State').read_text())
+        self.assertFalse(prefs['brave']['p3a']['enabled'])
+        self.assertTrue(prefs['brave']['p3a']['notice_acknowledged'])
+        await d2.finish_install('123',0x80000003)
+        await d2.prepare_remove('123')
+        await d2.finish_remove('123',0x80000003)
+        for p,content in saved.items(): self.assertEqual(p.read_bytes(),content)
+        self.assertTrue(d2.browser_profile().is_dir())
+
+    def test_d2_identity_and_five_artwork_assets(self):
+        d2=Installer(self.home,game='d2')
+        item=entry(AppName=d2.name,LaunchOptions=d2.launch_options())
+        self.assertTrue(matches(item,'d2'))
+        self.assertFalse(matches(item,'azeroth'))
+        self.assertFalse(matches(item,'pokebonk'))
+        for role in ['capsule','wide','hero','logo','icon']:
+            self.assertTrue((d2.assets/(role+'.png')).is_file())

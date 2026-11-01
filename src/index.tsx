@@ -1,14 +1,14 @@
 import { ButtonItem, PanelSection, PanelSectionRow, staticClasses } from "@decky/ui";
 import { callable, definePlugin, toaster } from "@decky/api";
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 
 declare const SteamClient: any;
 declare const App: any;
 declare const appStore: any;
 declare const ControllerStore: any;
 
-type Game = "pokebonk" | "azeroth";
-const games: {id: Game; name: string}[] = [{id:"pokebonk",name:"Pokebonk Online"},{id:"azeroth",name:"Azeroth Survivors"}];
+type Game = "pokebonk" | "azeroth" | "d2";
+const games: {id: Game; name: string}[] = [{id:"pokebonk",name:"Pokebonk Online"},{id:"azeroth",name:"Azeroth Survivors"},{id:"d2",name:"D2 Survivors"}];
 type Reply = {name?: string; ok: boolean; error?: string; message?: string; appid?: number; existing?: number; icon?: string; config?: string; home?: string; options?: string; assets?: {type: number; data: string}[]};
 const prepare = callable<[account: string, game: Game], Reply>("prepare_install");
 const finish = callable<[account: string, appid: number, game: Game], Reply>("finish_install");
@@ -16,6 +16,9 @@ const removal = callable<[account: string, game: Game], Reply>("prepare_remove")
 const clean = callable<[account: string, appid: number, game: Game], Reply>("finish_remove");
 const artwork = callable<[name: string, game: Game], Reply>("get_artwork");
 const verifyArtwork = callable<[account: string, appid: number, game: Game], Reply>("verify_artwork");
+type UpdateReply = {ok: boolean; error?: string; installed_version?: string; latest_version?: string; update_available?: boolean; downloaded?: boolean; path?: string};
+const checkUpdate = callable<[], UpdateReply>("check_update");
+const downloadUpdate = callable<[], UpdateReply>("download_update");
 const translations: Record<string, string> = {
   "작업에 실패했습니다.": "The operation failed.",
   "알 수 없는 게임입니다.": "Unknown game.",
@@ -136,11 +139,15 @@ async function removeGame(game: Game, progress: (s: string) => void) {
   return "제거 완료 · Brave와 저장 데이터 보존\nUninstalled · Brave and saves kept.";
 }
 function Content() {
+  const [selected, setSelected] = useState<Game | null>(null);
   const [busy, setBusy] = useState(false);
+  const [update, setUpdate] = useState<UpdateReply | null>(null);
+  const [updateStatus, setUpdateStatus] = useState("");
   const running = useRef(false);
   const [statuses, setStatuses] = useState<Record<Game,string>>({
     pokebonk:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
-    azeroth:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required"
+    azeroth:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
+    d2:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required"
   });
   const run = async (game: Game, action: typeof installGame) => {
     if (running.current) return;
@@ -152,11 +159,38 @@ function Content() {
     catch (e) { const message = bilingual(e instanceof Error ? e.message : String(e)); setStatus(message); toaster.toast({title,body:message}); }
     finally { running.current = false; setBusy(false); }
   };
-  return <>{games.map(game => <PanelSection key={game.id}>
-    <div className={staticClasses.PanelSectionTitle} style={{textTransform:"none"}}>{game.name}</div>
-    <PanelSectionRow><ButtonItem layout="below" disabled={busy} onClick={() => run(game.id, installGame)}>Install</ButtonItem></PanelSectionRow>
-    <PanelSectionRow><ButtonItem layout="below" disabled={busy} onClick={() => run(game.id, removeGame)}>Uninstall</ButtonItem></PanelSectionRow>
-    <PanelSectionRow><div style={{fontSize:13,lineHeight:1.6,color:"#b8bcbf",whiteSpace:"pre-line"}} role="status">{statuses[game.id]}</div></PanelSectionRow>
-  </PanelSection>)}</>;
+  const runUpdate = async (download: boolean) => {
+    if (running.current) return;
+    running.current = true;
+    setBusy(true);
+    setUpdateStatus(download ? "최신 ZIP 다운로드 중…\nDownloading the latest ZIP…" : "GitHub에서 최신 버전 확인 중…\nChecking GitHub for updates…");
+    setUpdate(null);
+    try {
+      const result = await (download ? downloadUpdate() : checkUpdate());
+      if (!result.ok) throw new Error(result.error || "작업에 실패했습니다.");
+      setUpdate(result);
+      const versions = `설치 / Installed: v${result.installed_version}\n최신 공개 / Latest: v${result.latest_version}`;
+      if (result.downloaded) setUpdateStatus(`다운로드 완료 · Decky에서 ZIP으로 설치하세요.\nDownloaded · Install the ZIP through Decky.\n${result.path}`);
+      else if (result.update_available) setUpdateStatus(`새 버전이 있습니다: v${result.latest_version}\nUpdate available: v${result.latest_version}\n${versions}`);
+      else setUpdateStatus(`최신 버전입니다.\nYou’re up to date.\n${versions}`);
+    } catch (e) {
+      setUpdateStatus(bilingual(e instanceof Error ? e.message : String(e)));
+    } finally { running.current = false; setBusy(false); }
+  };
+  return <><PanelSection>{games.map(game => <Fragment key={game.id}>
+    <PanelSectionRow><ButtonItem layout="below" disabled={busy} onClick={() => setSelected(selected === game.id ? null : game.id)}>
+      {selected === game.id ? "▾ " : "▸ "}{game.name}
+    </ButtonItem></PanelSectionRow>
+    {selected === game.id && <>
+      <PanelSectionRow><ButtonItem layout="below" disabled={busy} onClick={() => run(game.id, installGame)}>Install</ButtonItem></PanelSectionRow>
+      <PanelSectionRow><ButtonItem layout="below" disabled={busy} onClick={() => run(game.id, removeGame)}>Uninstall</ButtonItem></PanelSectionRow>
+      <PanelSectionRow><div style={{fontSize:13,lineHeight:1.6,color:"#b8bcbf",whiteSpace:"pre-line"}} role="status">{statuses[game.id]}</div></PanelSectionRow>
+    </>}
+  </Fragment>)}</PanelSection>
+  <PanelSection>
+    <PanelSectionRow><ButtonItem layout="below" disabled={busy} onClick={() => runUpdate(false)}>Check for Updates</ButtonItem></PanelSectionRow>
+    {update?.update_available && !update.downloaded && <PanelSectionRow><ButtonItem layout="below" disabled={busy} onClick={() => runUpdate(true)}>Download v{update.latest_version}</ButtonItem></PanelSectionRow>}
+    {updateStatus && <PanelSectionRow><div style={{fontSize:13,lineHeight:1.6,color:"#b8bcbf",whiteSpace:"pre-line",overflowWrap:"anywhere"}} role="status">{updateStatus}</div></PanelSectionRow>}
+  </PanelSection></>;
 }
 export default definePlugin(() => ({name:"Decky Web Games", titleView:<div className={staticClasses.Title}>Decky Web Games</div>, content:<Content/>, icon:<span style={{fontWeight:900}}>WG</span>, onDismount() {}}));

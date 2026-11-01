@@ -7,10 +7,11 @@ function setup({gamepad=true, existing=false}={}) {
   const calls = [];
   const apps = new Map();
   let nextId = 0x80000001;
-  const ids = {pokebonk:0x80000001,azeroth:0x80000002};
+  const ids = {pokebonk:0x80000001,azeroth:0x80000002,d2:0x80000003};
+  const names = {pokebonk:'Pokebonk Online',azeroth:'Azeroth Survivors',d2:'D2 Survivors'};
   if(existing) apps.set(ids.azeroth, {is_running:false});
   const api = {
-    prepare_install: async (account,game) => ({ok:true,name:game==='azeroth'?'Azeroth Survivors':'Pokebonk Online',existing:existing?ids[game]:undefined,home:'"/home/deck"',options:game,icon:`/${game}/icon.png`,config:'template://gamepad'}),
+    prepare_install: async (account,game) => ({ok:true,name:names[game],existing:existing?ids[game]:undefined,home:'"/home/deck"',options:game,icon:`/${game}/icon.png`,config:'template://gamepad'}),
     finish_install: async (...args) => {calls.push(['finish',...args]);return {ok:true};},
     prepare_remove: async (account,game) => ({ok:true,appid:ids[game]}),
     finish_remove: async (...args) => {calls.push(['clean',...args]);return {ok:true};},
@@ -53,6 +54,15 @@ function setup({gamepad=true, existing=false}={}) {
   assert.ok(!both.apps.has(0x80000002));
   assert.equal(both.calls.filter(c=>c[0]==='clean').at(-1)[3],'azeroth');
   console.log('PASS: two installs, game-specific artwork, native template, isolated uninstall');
+
+  const three=setup();
+  for(const game of ['pokebonk','azeroth','d2']) await three.installGame(game,()=>{});
+  assert.deepEqual(three.calls.filter(c=>c[0]==='AddShortcut').map(c=>c[1]),['Pokebonk Online','Azeroth Survivors','D2 Survivors']);
+  assert.deepEqual(three.calls.filter(c=>c[0]==='art'&&c[2]==='d2').map(c=>c[1]),['capsule','hero','logo','wide']);
+  await three.removeGame('d2',()=>{});
+  assert.ok(three.apps.has(0x80000001)&&three.apps.has(0x80000002));
+  assert.ok(!three.apps.has(0x80000003));
+  console.log('PASS: D2 install/artwork/uninstall preserves both existing games');
 
   const failure=setup({gamepad:false});
   await assert.rejects(()=>failure.installGame('azeroth',()=>{}));

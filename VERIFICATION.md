@@ -32,3 +32,18 @@ On the affected Steam Deck, Steam Input reported a selected gamepad-only profile
 - TypeScript typecheck and production build passed.
 - Official Azeroth v0.127.0 menu and native gamepad settings were observed in a desktop browser.
 - Physical Steam Deck Gaming Mode: test plugin installed, Azeroth shortcut created (separate from Pokebonk), all four library artwork hashes verified, native gamepad-only template selected, and AMD RDNA 2 WebGPU adapter initialized. Official game menu rendered. Installation/removal is blocked while the game runs. The user confirmed physical gamepad controls working; world rendering, uninstall/reinstall, preserved browser data and unchanged local storage hashes across reinstall were verified. A first-run Brave analytics infobar was reproduced and fixed by disabling P3A and acknowledging its notice in the dedicated game profile. Long-session performance and stability remain untested.
+## D2 Survivors — v1.2.0
+
+- 25 Python tests passed, plus frontend three-game install/artwork/uninstall isolation and rollback checks; typecheck and build passed.
+- Installed the local test build on Steam Deck and created a separate D2 shortcut, retaining both existing games.
+- Four Steam library artwork files passed hash verification; the icon uses its own copied file.
+- Selected gamepad-only native Steam Deck controls and verified the browser sees a standard Xbox controller after physical input.
+- Official hosted-files selection loaded the title and Rogue Encampment without a local Diablo installation. This was the site's own setup action; no game files or hosted assets are bundled in the plugin.
+- D2 uses its own browser profile and does not require Azeroth's WebGPU flags. P3A is disabled and its notice acknowledged in that dedicated profile.
+- Long-session behavior and D2 physical uninstall/reinstall have not been tested. The automated isolation/preservation tests passed; the user confirmed gamepad controls during play.
+
+D2 Korean follow-up: the game initially used en-US from the new browser profile. D2 now launches with Korean UI/accept-language defaults; ko-KR and the Korean game document were verified after relaunch, and the official game language preference was saved as ko. Other games keep their language settings.
+
+Game menu UI: physical Steam Deck DOM checks passed for all-collapsed initial state, opening each of the three games, switching the open game, and collapsing it again. Exactly one Install/Uninstall pair is shown for the selected game. Final screenshot confirms both status lines fit on screen.
+
+Updater: 36 Python tests passed, plus simulated update UI checks for new/current/newer installed versions, busy state, download completion and retry. On Steam Deck, the installed plugin queried the public GitHub latest release and its real UI showed up-to-date without a downgrade button. A separate process simulating v1.0.4 downloaded the real public v1.1.0 install ZIP, verified the SHA-256 and ZIP metadata, and saved it directly in `/home/deck/Downloads/`. That test did not change the installed version. The newer-release UI branch was tested with fixtures, not by publishing a test release.

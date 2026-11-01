@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- 디아블로 서바이버 추가
+
 ## 1.1.0
 
 - Add Azeroth Survivors alongside Pokebonk, with separate Install/Uninstall buttons.

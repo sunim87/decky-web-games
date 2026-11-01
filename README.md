@@ -1,21 +1,23 @@
 # Decky Web Games
 
+
 Steam Deck용 웹게임 설치·제거 플러그인 / Web game launcher for Decky Loader.
 
 ![Azeroth Survivors library artwork](assets/azeroth/wide.png)
 
 ## 한국어
 
-**Pokebonk Online**과 **Azeroth Survivors**를 게임별 **Install / Uninstall** 버튼으로 관리합니다. Install을 누르면 Brave 브라우저 준비, Steam 바로가기, 네이티브 게임패드 설정과 라이브러리 이미지 등록을 진행합니다. 인터넷 연결이 필요합니다.
+**Pokebonk Online**, **Azeroth Survivors**, **D2 Survivors**를 게임별 **Install / Uninstall** 버튼으로 관리합니다. Install을 누르면 Brave 브라우저 준비, Steam 바로가기, 네이티브 게임패드 설정과 라이브러리 이미지 등록을 진행합니다. 인터넷 연결이 필요합니다.
 
 | 게임 | 공식 사이트 | 실행 방식 |
 | --- | --- | --- |
 | Pokebonk Online | https://pokebonk.com/ | Brave 전체화면 |
 | Azeroth Survivors | https://wow.aethus.pl/ | 전용 Brave 프로필 · WebGPU/Vulkan |
+| D2 Survivors | https://d2survivors.lol/play/ | 전용 Brave 프로필 · 한국어 기본 실행 |
 
 ### 설치
 
-1. [릴리스 페이지](https://github.com/sunim87/decky-web-games/releases/latest)에서 **decky-web-games-v1.1.0.zip**을 다운로드합니다. `-source.zip`은 소스 코드 보관용입니다.
+1. [릴리스 페이지](https://github.com/sunim87/decky-web-games/releases/latest)에서 **decky-web-games-v1.2.0.zip**을 다운로드합니다. `-source.zip`은 소스 코드 보관용입니다.
 2. Decky Loader 설정의 개발자 메뉴에서 ZIP 설치 기능으로 설치합니다.
 3. Decky에서 **Decky Web Games**를 열고 원하는 게임의 **Install**을 누릅니다.
 4. Steam 라이브러리에서 해당 게임을 실행합니다.
@@ -38,9 +40,9 @@ Decky에서 플러그인만 삭제하면 게임 바로가기는 남습니다. �
 
 ## English
 
-Install and uninstall **Pokebonk Online** and **Azeroth Survivors** from Decky. Each game has its own buttons, Steam shortcut, native gamepad setup and five library images. Games load directly from their creators' websites and require internet access.
+Install and uninstall **Pokebonk Online**, **Azeroth Survivors** and **D2 Survivors** from Decky. Each game has its own buttons, Steam shortcut, native gamepad setup and five library images. Games load directly from their creators' websites and require internet access.
 
-Download **decky-web-games-v1.1.0.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
+Download **decky-web-games-v1.2.0.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
 
 Brave is reused or installed from Flathub. Azeroth uses a dedicated profile with Linux WebGPU/Vulkan options and read-only `/run/udev` access. Its P3A notice is disabled in that dedicated profile. Browser sandboxing and certificate checks stay enabled.
 
@@ -48,7 +50,7 @@ Close the game before pressing **Uninstall**. Only the managed shortcut and libr
 
 ## Validation
 
-- 23 Python regression tests, frontend installation/rollback tests, typecheck and build passed.
+- 36 Python regression tests, frontend installation/rollback tests, typecheck and build passed.
 - Physical Steam Deck Gaming Mode launch, AMD RDNA 2 WebGPU initialization, artwork, native gamepad selection and user-confirmed controls were tested.
 - Uninstall/reinstall preserved the browser profile and local storage hashes; existing Pokebonk stayed available.
 - Brave first-run infobar fix was verified after relaunch.
@@ -62,6 +64,7 @@ Node.js 20+, pnpm 11.25.0 and Python 3.11+:
 pnpm install --frozen-lockfile
 pnpm test
 pnpm test:frontend
+pnpm test:update-ui
 pnpm typecheck
 pnpm build
 python scripts/package_plugin.py
@@ -71,6 +74,12 @@ The install ZIP retains the existing `decky-pokebonk/` plugin directory and pers
 
 ## Credits and license
 
-PokéBonk is by Charcher; Azeroth Survivors is by Aethus. This plugin opens their official sites and does not redistribute game code or unlocked offline builds. Generated library artwork is fan artwork, not an official game screenshot. The Pokebonk PB icon originates from the game's bundled icon; the controller template is based on Steam's standard gamepad template.
+PokéBonk is by Charcher; Azeroth Survivors is by Aethus; D2 Survivors is by framara. This plugin opens their official sites and does not redistribute game code or unlocked offline builds. Generated library artwork is fan artwork, not an official game screenshot. The Pokebonk PB icon originates from the game's bundled icon; the controller template is based on Steam's standard gamepad template.
 
 Plugin code is [MIT licensed](LICENSE); this does not grant rights to game characters, artwork or trademarks. Unofficial community project, not affiliated with the game developers, Valve, Blizzard Entertainment, Nintendo, GAME FREAK, Creatures or The Pokémon Company.
+
+## Plugin updates / 플러그인 업데이트
+
+**Check for Updates** checks the latest public stable GitHub release. A newer release shows its version and a **Download** button. The ZIP is saved directly to `~/Downloads/`, verified against GitHub’s SHA-256 digest and plugin/version metadata, and is not installed automatically. Install the downloaded ZIP through Decky. Current or newer installed builds show an up-to-date message; test builds are not downgraded. Requests run only when you press a button.
+
+업데이트 확인 버튼으로 새 공개 버전을 확인하고, 새 버전이 있으면 다운로드 버튼을 표시합니다. ZIP은 **다운로드 폴더 바로 아래**에 저장합니다. 다운로드한 ZIP은 Decky의 ZIP 설치로 적용할 수 있습니다.

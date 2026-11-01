@@ -1,20 +1,24 @@
 """Unprivileged Decky backend. Steam library writes go through the frontend API."""
 import asyncio
 import base64
+import json
 from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from installer import Installer, game_info
+from installer import Installer, game_info, GAMES
+from updater import Updater, error_reply
 
 
 class Plugin:
     async def _main(self):
         self.installer = Installer()
-        self.installers = {"pokebonk": self.installer, "azeroth": Installer(game="azeroth")}
+        self.installers = {game: self.installer if game == "pokebonk" else Installer(game=game) for game in GAMES}
         self.lock = asyncio.Lock()
+        self.update_lock = asyncio.Lock()
+        self.updater = Updater(self.installer.home, json.loads((ROOT / "package.json").read_text())["version"])
 
     async def _unload(self):
         pass
@@ -41,6 +45,19 @@ class Plugin:
 
     async def verify_artwork(self, account: str, appid: int, game: str = "pokebonk"):
         return await self._call("verify_artwork", account, appid, game=game)
+
+    async def _update_call(self, method):
+        try:
+            async with self.update_lock:
+                return await asyncio.to_thread(getattr(self.updater, method))
+        except Exception as exc:
+            return error_reply(exc)
+
+    async def check_update(self):
+        return await self._update_call("check")
+
+    async def download_update(self):
+        return await self._update_call("download")
 
     async def get_artwork(self, name: str, game: str = "pokebonk"):
         types = {"capsule": 0, "hero": 1, "logo": 2, "wide": 3, "icon": 4}

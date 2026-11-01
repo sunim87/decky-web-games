@@ -15,6 +15,7 @@ OPTIONS = "run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command
 GAMES = {
     "pokebonk": {"name": NAME, "url": "https://pokebonk.com/"},
     "azeroth": {"name": "Azeroth Survivors", "url": "https://wow.aethus.pl/"},
+    "d2": {"name": "D2 Survivors", "url": "https://d2survivors.lol/play/"},
 }
 
 
@@ -157,15 +158,23 @@ class Installer:
     def launch_options(self):
         if self.game == "pokebonk": return OPTIONS
         # A separate browser process is required: an existing Brave process ignores new GPU flags.
-        profile = self.home / ".var/app" / BRAVE / "config/azeroth-survivors"
+        profile = self.browser_profile()
+        graphics = ("--enable-unsafe-webgpu --enable-features=Vulkan --use-angle=vulkan "
+                    if self.game == "azeroth" else "--enable-features=OverlayScrollbar ")
+        language = "--lang=ko --accept-lang=ko-KR,ko,en-US,en " if self.game == "d2" else ""
         return ("run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave "
                 + BRAVE + " --no-first-run --no-default-browser-check --ozone-platform=x11 --kiosk "
-                "--enable-unsafe-webgpu --enable-features=Vulkan --use-angle=vulkan "
+                + graphics + language +
                 "--user-data-dir=" + shlex.quote(str(profile)) + " " + GAMES[self.game]["url"])
 
+    def browser_profile(self):
+        folders = {"azeroth": "azeroth-survivors", "d2": "d2-survivors"}
+        if self.game not in folders: return None
+        return self.home / ".var/app" / BRAVE / "config" / folders[self.game]
+
     def configure_browser_profile(self):
-        if self.game != "azeroth": return
-        profile = self.home / ".var/app" / BRAVE / "config/azeroth-survivors"
+        profile = self.browser_profile()
+        if profile is None: return
         marker = ("--user-data-dir=" + str(profile)).encode()
         for proc in Path("/proc").glob("[0-9]*/cmdline"):
             try:
