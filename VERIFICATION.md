@@ -4,7 +4,7 @@
 
 - Removed the Steam Deck-only controller selection. Xbox 360/One/Elite, generic gamepads and DualSense/Edge use their corresponding base gamepad templates; Steam Deck retains its Neptune template.
 - Simulated install tests cover all seven controller types across all three games, actual device-index use, keyboard/mouse exclusion, multiple pads, duplicate indices, invalid/missing devices and rollback when a secondary pad configuration fails verification.
-- No controller causes failure before backend preparation or shortcut changes.
+- Follow-up: controller discovery now accepts numeric-string indices, alternative field names, object/Map stores and the native controller-list callback. Unknown gamepad types attempt conversion from the Xbox base template. Missing controllers or failed controller verification preserve the installed shortcut with an explicit unverified-controls status. Artwork/backend errors still roll back new installs. These branches pass simulated tests.
 - ROG Ally and Legion Go physical installation, template conversion and gameplay remain untested. No connected handheld was reachable during this change.
 
 Verified on a physical Steam Deck in SteamOS Gaming Mode with Decky Loader on 2026-10-29.

@@ -6,6 +6,7 @@ declare const SteamClient: any;
 declare const App: any;
 declare const appStore: any;
 declare const ControllerStore: any;
+declare const controllerConfiguratorStore: any;
 
 type Game = "pokebonk" | "azeroth" | "d2";
 const games: {id: Game; name: string}[] = [{id:"pokebonk",name:"Pokebonk Online"},{id:"azeroth",name:"Azeroth Survivors"},{id:"d2",name:"D2 Survivors"}];
@@ -78,22 +79,63 @@ const gamepadTemplates: Record<number, string> = {
   46: "controller_xboxone",
   48: "controller_ps5",
 };
-function connectedGamepads(): {index: number; template: string}[] {
-  const plans: {index: number; template: string}[] = [];
-  for (const controller of ControllerStore.GetControllers()) {
-    const type = gamepadTemplates[controller.eControllerType];
-    const index = controller.nControllerIndex;
-    if (type && Number.isInteger(index) && index >= 0 && !plans.some(p => p.index === index))
-      plans.push({index, template: `template://${type}_gamepad_joystick.vdf`});
+function controllerRows(value: any): any[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try { return controllerRows(JSON.parse(value)); } catch { return []; }
   }
-  if (!plans.length)
-    throw new Error("지원되는 게임패드를 찾지 못했습니다. 내장 컨트롤러를 게임패드 모드로 켠 뒤 다시 시도하세요.");
+  if (value && typeof value.values === "function" && typeof value.get === "function") return [...value.values()];
+  if (value && typeof value === "object") {
+    if ("nControllerIndex" in value || "unControllerIndex" in value || "controller_index" in value) return [value];
+    for (const key of ["controllers", "rgControllers", "controller_list"])
+      if (value[key]) return controllerRows(value[key]);
+    return Object.values(value);
+  }
+  return [];
+}
+function gamepadPlans(rows: any[]): {index: number; template: string}[] {
+  const plans: {index: number; template: string}[] = [];
+  for (const controller of rows) {
+    if (!controller || typeof controller !== "object") continue;
+    const rawIndex = controller.nControllerIndex ?? controller.unControllerIndex ?? controller.controller_index;
+    const rawType = controller.eControllerType ?? controller.nControllerType ?? controller.controller_type;
+    if (rawIndex == null || rawIndex === "" || rawType == null || rawType === "") continue;
+    const index = Number(rawIndex), type = Number(rawType);
+    // 16 is Steam's invalid device index. Keyboard, mouse and front-panel
+    // devices are not gamepads. Do not reject new gamepad types by allowlist.
+    if (!Number.isInteger(index) || index < 0 || index >= 16 || !Number.isInteger(type) || type < 0 || type >= 400 || type === 20) continue;
+    const template = gamepadTemplates[type] || "controller_xboxone";
+    if (!plans.some(p => p.index === index))
+      plans.push({index, template: `template://${template}_gamepad_joystick.vdf`});
+  }
+  return plans;
+}
+async function connectedGamepads(): Promise<{index: number; template: string}[]> {
+  const rows: any[] = [];
+  try { rows.push(...controllerRows(ControllerStore.GetControllers())); } catch { /* Store varies between Steam versions. */ }
+  try { rows.push(...controllerRows(controllerConfiguratorStore.m_controllerList)); } catch { /* Optional Steam store. */ }
+  let plans = gamepadPlans(rows);
+  if (plans.length || typeof SteamClient.Input.RegisterForControllerListChanges !== "function") return plans;
+  let subscription: any;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const observed = await new Promise<any[]>(resolve => {
+      subscription = SteamClient.Input.RegisterForControllerListChanges((value: any) => {
+        const found = controllerRows(value);
+        if (gamepadPlans(found).length) resolve(found);
+      });
+      timer = setTimeout(() => resolve([]), 1500);
+    });
+    plans = gamepadPlans(observed);
+  } catch { /* Installation can still use the device's existing native input. */ }
+  finally {
+    if (timer !== undefined) clearTimeout(timer);
+    subscription?.unregister?.();
+  }
   return plans;
 }
 
-async function installGame(game: Game, progress: (s: string) => void) {
-  // Fail before preparing files or modifying shortcuts if no gamepad is present.
-  const controllers = connectedGamepads();
+async function installGame(game: Game, progress: (s: string) => void): Promise<string> {
   const user = account();
   progress("Brave와 설치 파일 준비 중…\nPreparing Brave and installation files…");
   const r = check(await prepare(user, game));
@@ -127,17 +169,23 @@ async function installGame(game: Game, progress: (s: string) => void) {
     progress("조작 설정을 적용하는 중…\nApplying controller settings…");
     // Save ownership before selecting the config, so a retry can repair partial installs.
     check(await finish(user, id, game));
+    const controllers = await connectedGamepads();
+    let controlsVerified = controllers.length > 0;
     for (const controller of controllers) {
-      await SteamClient.Input.SetSelectedConfigForApp(id, controller.index, controller.template, false, 0);
-      let verified = false;
-      for (let attempt = 0; attempt < 40; attempt++) {
-        const config = await SteamClient.Input.GetConfigForAppAndController(id, controller.index);
-        if (config?.bUsesGamepad && !config.bUsesKeyboard && !config.bUsesMouse) { verified = true; break; }
-        await delay(100);
-      }
-      if (!verified) throw new Error("게임패드 설정 적용을 확인하지 못했습니다.");
+      try {
+        await SteamClient.Input.SetSelectedConfigForApp(id, controller.index, controller.template, false, 0);
+        let verified = false;
+        for (let attempt = 0; attempt < 40; attempt++) {
+          const config = await SteamClient.Input.GetConfigForAppAndController(id, controller.index);
+          if (config?.bUsesGamepad && !config.bUsesKeyboard && !config.bUsesMouse) { verified = true; break; }
+          await delay(100);
+        }
+        if (!verified) throw new Error("게임패드 설정 적용을 확인하지 못했습니다.");
+      } catch { controlsVerified = false; }
     }
     check(await finish(user, id, game));
+    if (!controlsVerified)
+      return "설치 완료 · 패드 자동 설정 미확인. Steam 조작 설정을 확인하세요.\nInstalled · Controls unverified. Check Steam controller settings.";
     return "설치 완료 · 라이브러리에서 실행하세요.\nInstalled · Launch from your library.";
   } catch (error) {
     if (created && id) {
