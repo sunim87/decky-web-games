@@ -40,7 +40,7 @@ const translations: Record<string, string> = {
   "기존 바로가기에 Brave 자동 제거 연결 정보가 있습니다. 브라우저 보호를 위해 자동 제거를 중단했습니다.": "This shortcut may uninstall Brave with it. Removal was stopped to protect your browser.",
   "올바르지 않은 바로가기 ID입니다.": "The shortcut ID is invalid.",
   "조작 설정 파일이 없습니다. 설치를 다시 시도하세요.": "The controller configuration is missing. Try installing again.",
-  "Steam Deck 내장 컨트롤러를 찾지 못했습니다.": "Could not find the built-in Steam Deck controller.",
+  "지원되는 게임패드를 찾지 못했습니다. 내장 컨트롤러를 게임패드 모드로 켠 뒤 다시 시도하세요.": "No supported gamepad found. Enable gamepad mode on the built-in controller and try again.",
   "게임패드 설정 적용을 확인하지 못했습니다.": "Could not verify the gamepad configuration.",
   "설치 기록과 제거 대상이 다릅니다.": "The removal target does not match the installation record.",
 };
@@ -66,7 +66,34 @@ function assertStopped(id: number) {
     throw new Error("게임을 종료한 뒤 다시 시도하세요.");
 }
 
+// Steam controller types (not device indices). Handhelds may expose Xbox or
+// DualSense devices, including through InputPlumber/HHD. Steam converts the
+// base Xbox/DualSense templates for Elite/Edge devices; verify the result below.
+const gamepadTemplates: Record<number, string> = {
+  4: "controller_neptune",
+  30: "controller_generic",
+  31: "controller_xbox360",
+  32: "controller_xboxone",
+  45: "controller_ps5",
+  46: "controller_xboxone",
+  48: "controller_ps5",
+};
+function connectedGamepads(): {index: number; template: string}[] {
+  const plans: {index: number; template: string}[] = [];
+  for (const controller of ControllerStore.GetControllers()) {
+    const type = gamepadTemplates[controller.eControllerType];
+    const index = controller.nControllerIndex;
+    if (type && Number.isInteger(index) && index >= 0 && !plans.some(p => p.index === index))
+      plans.push({index, template: `template://${type}_gamepad_joystick.vdf`});
+  }
+  if (!plans.length)
+    throw new Error("지원되는 게임패드를 찾지 못했습니다. 내장 컨트롤러를 게임패드 모드로 켠 뒤 다시 시도하세요.");
+  return plans;
+}
+
 async function installGame(game: Game, progress: (s: string) => void) {
+  // Fail before preparing files or modifying shortcuts if no gamepad is present.
+  const controllers = connectedGamepads();
   const user = account();
   progress("Brave와 설치 파일 준비 중…\nPreparing Brave and installation files…");
   const r = check(await prepare(user, game));
@@ -100,17 +127,16 @@ async function installGame(game: Game, progress: (s: string) => void) {
     progress("조작 설정을 적용하는 중…\nApplying controller settings…");
     // Save ownership before selecting the config, so a retry can repair partial installs.
     check(await finish(user, id, game));
-    const controllers = ControllerStore.GetControllers();
-    const deck = controllers.find((c: any) => c.eControllerType === 4);
-    if (!deck) throw new Error("Steam Deck 내장 컨트롤러를 찾지 못했습니다.");
-    await SteamClient.Input.SetSelectedConfigForApp(id, deck.nControllerIndex, r.config, false, 0);
-    let verified = false;
-    for (let attempt = 0; attempt < 40; attempt++) {
-      const config = await SteamClient.Input.GetConfigForAppAndController(id, deck.nControllerIndex);
-      if (config?.bUsesGamepad && !config.bUsesKeyboard && !config.bUsesMouse) { verified = true; break; }
-      await delay(100);
+    for (const controller of controllers) {
+      await SteamClient.Input.SetSelectedConfigForApp(id, controller.index, controller.template, false, 0);
+      let verified = false;
+      for (let attempt = 0; attempt < 40; attempt++) {
+        const config = await SteamClient.Input.GetConfigForAppAndController(id, controller.index);
+        if (config?.bUsesGamepad && !config.bUsesKeyboard && !config.bUsesMouse) { verified = true; break; }
+        await delay(100);
+      }
+      if (!verified) throw new Error("게임패드 설정 적용을 확인하지 못했습니다.");
     }
-    if (!verified) throw new Error("게임패드 설정 적용을 확인하지 못했습니다.");
     check(await finish(user, id, game));
     return "설치 완료 · 라이브러리에서 실행하세요.\nInstalled · Launch from your library.";
   } catch (error) {

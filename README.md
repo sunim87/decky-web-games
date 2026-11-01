@@ -1,7 +1,7 @@
 # Decky Web Games
 
 
-Steam Deck용 웹게임 설치·제거 플러그인 / Web game launcher for Decky Loader.
+SteamOS 휴대용 기기를 위한 웹게임 설치·제거 플러그인 / Web game launcher for Decky Loader on SteamOS handhelds.
 
 ![Azeroth Survivors library artwork](assets/azeroth/wide.png)
 
@@ -17,7 +17,7 @@ Steam Deck용 웹게임 설치·제거 플러그인 / Web game launcher for Deck
 
 ### 설치
 
-1. [릴리스 페이지](https://github.com/sunim87/decky-web-games/releases/latest)에서 **decky-web-games-v1.1.1.zip**을 다운로드합니다. `-source.zip`은 소스 코드 보관용입니다.
+1. [릴리스 페이지](https://github.com/sunim87/decky-web-games/releases/latest)에서 **decky-web-games-v1.1.2.zip**을 다운로드합니다. `-source.zip`은 소스 코드 보관용입니다.
 2. Decky Loader 설정의 개발자 메뉴에서 ZIP 설치 기능으로 설치합니다.
 3. Decky에서 **Decky Web Games**를 열고 원하는 게임의 **Install**을 누릅니다.
 4. Steam 라이브러리에서 해당 게임을 실행합니다.
@@ -26,7 +26,9 @@ Steam Deck용 웹게임 설치·제거 플러그인 / Web game launcher for Deck
 
 ### 조작 및 실행
 
-Steam Deck 내장 컨트롤러에 네이티브 게임패드 설정을 적용합니다. 게임패드 식별에 필요한 `/run/udev` 읽기 권한도 실행 옵션에 포함합니다. 게임 화면이 활성화된 상태에서 버튼을 한 번 누르세요.
+연결된 Steam Deck, Xbox 계열, 일반 게임패드 및 DualSense 계열 컨트롤러에 네이티브 게임패드 설정을 적용합니다. ROG Ally·Legion Go가 Xbox 또는 DualSense로 인식되는 환경도 처리합니다. 내장 컨트롤러는 게임패드 모드로 켜 주세요. 게임패드 식별에 필요한 `/run/udev` 읽기 권한도 실행 옵션에 포함합니다. 게임 화면이 활성화된 상태에서 버튼을 한 번 누르세요.
+
+ROG Ally·Legion Go 호환 수정은 자동 테스트로 검증했으며, 해당 기기에서의 실제 설치·플레이 테스트는 아직 진행하지 않았습니다. 기존 설치는 수정 ZIP을 설치한 다음 게임을 종료한 상태에서 각 게임의 **Install**을 다시 눌러 조작 설정을 적용할 수 있습니다.
 
 Azeroth는 왼쪽 스틱 이동, 오른쪽 스틱 시점 회전, A 점프, 범퍼·트리거 확대/축소를 지원합니다. 자세한 버튼 동작은 각 게임의 설정을 확인하세요.
 
@@ -42,7 +44,7 @@ Decky에서 플러그인만 삭제하면 게임 바로가기는 남습니다. �
 
 Install and uninstall **Pokebonk Online**, **Azeroth Survivors** and **D2 Survivors** from Decky. Each game has its own buttons, Steam shortcut, native gamepad setup and five library images. Games load directly from their creators' websites and require internet access.
 
-Download **decky-web-games-v1.1.1.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
+Download **decky-web-games-v1.1.2.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
 
 Brave is reused or installed from Flathub. Azeroth uses a dedicated profile with Linux WebGPU/Vulkan options and read-only `/run/udev` access. Its P3A notice is disabled in that dedicated profile. Browser sandboxing and certificate checks stay enabled.
 
