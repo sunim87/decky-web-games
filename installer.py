@@ -159,7 +159,7 @@ class Installer:
         if self.game == "pokebonk": return OPTIONS
         # A separate browser process is required: an existing Brave process ignores new GPU flags.
         profile = self.browser_profile()
-        graphics = ("--enable-unsafe-webgpu --enable-features=Vulkan --use-angle=vulkan "
+        graphics = ("--enable-unsafe-webgpu --enable-features=Vulkan --use-angle=vulkan --autoplay-policy=no-user-gesture-required "
                     if self.game == "azeroth" else "--enable-features=OverlayScrollbar ")
         language = "--lang=ko --accept-lang=ko-KR,ko,en-US,en " if self.game == "d2" else ""
         return ("run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave "
