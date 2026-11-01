@@ -32,7 +32,7 @@ On the affected Steam Deck, Steam Input reported a selected gamepad-only profile
 - TypeScript typecheck and production build passed.
 - Official Azeroth v0.127.0 menu and native gamepad settings were observed in a desktop browser.
 - Physical Steam Deck Gaming Mode: test plugin installed, Azeroth shortcut created (separate from Pokebonk), all four library artwork hashes verified, native gamepad-only template selected, and AMD RDNA 2 WebGPU adapter initialized. Official game menu rendered. Installation/removal is blocked while the game runs. The user confirmed physical gamepad controls working; world rendering, uninstall/reinstall, preserved browser data and unchanged local storage hashes across reinstall were verified. A first-run Brave analytics infobar was reproduced and fixed by disabling P3A and acknowledging its notice in the dedicated game profile. Long-session performance and stability remain untested.
-## D2 Survivors — v1.2.0
+## D2 Survivors — v1.1.1
 
 - 25 Python tests passed, plus frontend three-game install/artwork/uninstall isolation and rollback checks; typecheck and build passed.
 - Installed the local test build on Steam Deck and created a separate D2 shortcut, retaining both existing games.

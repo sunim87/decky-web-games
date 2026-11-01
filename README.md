@@ -17,7 +17,7 @@ Steam Deck용 웹게임 설치·제거 플러그인 / Web game launcher for Deck
 
 ### 설치
 
-1. [릴리스 페이지](https://github.com/sunim87/decky-web-games/releases/latest)에서 **decky-web-games-v1.2.0.zip**을 다운로드합니다. `-source.zip`은 소스 코드 보관용입니다.
+1. [릴리스 페이지](https://github.com/sunim87/decky-web-games/releases/latest)에서 **decky-web-games-v1.1.1.zip**을 다운로드합니다. `-source.zip`은 소스 코드 보관용입니다.
 2. Decky Loader 설정의 개발자 메뉴에서 ZIP 설치 기능으로 설치합니다.
 3. Decky에서 **Decky Web Games**를 열고 원하는 게임의 **Install**을 누릅니다.
 4. Steam 라이브러리에서 해당 게임을 실행합니다.
@@ -42,7 +42,7 @@ Decky에서 플러그인만 삭제하면 게임 바로가기는 남습니다. �
 
 Install and uninstall **Pokebonk Online**, **Azeroth Survivors** and **D2 Survivors** from Decky. Each game has its own buttons, Steam shortcut, native gamepad setup and five library images. Games load directly from their creators' websites and require internet access.
 
-Download **decky-web-games-v1.2.0.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
+Download **decky-web-games-v1.1.1.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
 
 Brave is reused or installed from Flathub. Azeroth uses a dedicated profile with Linux WebGPU/Vulkan options and read-only `/run/udev` access. Its P3A notice is disabled in that dedicated profile. Browser sandboxing and certificate checks stay enabled.
 
