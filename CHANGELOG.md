@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3
+
+- Compress library artwork using 256-color PNG palettes; retain pixel dimensions and transparency.
+- Add Pokemon Brave League with touch controls, an isolated Brave profile and five library artwork assets based on the official site.
+- Detect the active Steam/Gamescope display at every Brave League launch and calculate fullscreen startup bounds dynamically. Confirmed on Steam Deck; other handheld resolutions are covered by automated calculations, not physical-device tests.
+- Skip controller detection and template changes for the touch-only game. Preserve browser saves and existing controller profiles on uninstall.
+
 ## 1.1.2
 
 - ROG Ally·Legion Go에서 Xbox·DualSense 계열로 인식되는 컨트롤러에도 게임패드 설정을 적용하도록 수정했습니다.

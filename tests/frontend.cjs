@@ -3,15 +3,15 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
 
-function setup({gamepad=true, existing=false, controllers=[{eControllerType:4,nControllerIndex:15}], failedIndex, configurator=[], observed, discoveryThrows=false, storeThrows=false, artworkFails=false}={}) {
+function setup({gamepad=true, existing=false, controllers=[{eControllerType:4,nControllerIndex:15}], failedIndex, configurator=[], observed, discoveryThrows=false, storeThrows=false, artworkFails=false, startId=0x80000001}={}) {
   const calls = [];
   const apps = new Map();
-  let nextId = 0x80000001;
-  const ids = {pokebonk:0x80000001,azeroth:0x80000002,d2:0x80000003};
-  const names = {pokebonk:'Pokebonk Online',azeroth:'Azeroth Survivors',d2:'D2 Survivors'};
+  let nextId = startId;
+  const ids = {pokebonk:0x80000001,azeroth:0x80000002,d2:0x80000003,braveleague:0x80000004};
+  const names = {pokebonk:'Pokebonk Online',azeroth:'Azeroth Survivors',d2:'D2 Survivors',braveleague:'Pokemon Brave League'};
   if(existing) apps.set(ids.azeroth, {is_running:false});
   const api = {
-    prepare_install: async (account,game) => {calls.push(['prepare',game]);return {ok:true,name:names[game],existing:existing?ids[game]:undefined,home:'"/home/deck"',options:game,icon:`/${game}/icon.png`,config:'template://gamepad'};},
+    prepare_install: async (account,game) => {calls.push(['prepare',game]);return {ok:true,name:names[game],existing:existing?ids[game]:undefined,home:'"/home/deck"',options:game,icon:`/${game}/icon.png`,config:'template://gamepad',controls:game==='braveleague'?'touch':undefined,exe:game==='braveleague'?'/usr/bin/python3':undefined};},
     finish_install: async (...args) => {calls.push(['finish',...args]);return {ok:true};},
     prepare_remove: async (account,game) => ({ok:true,appid:ids[game]}),
     finish_remove: async (...args) => {calls.push(['clean',...args]);return {ok:true};},
@@ -43,6 +43,14 @@ function setup({gamepad=true, existing=false, controllers=[{eControllerType:4,nC
 }
 
 (async()=>{
+  const touch=setup({controllers:[],storeThrows:true,startId:0x80000004});
+  assert.match(await touch.installGame('braveleague',()=>{}),/touch controls/);
+  assert.equal(touch.calls.filter(c=>c[0]==='config'||c[0]==='subscribe').length,0);
+  assert.equal(touch.calls.filter(c=>c[0]==='art').length,4);
+  assert.equal(touch.calls.find(c=>c[0]==='SetShortcutExe')[2],'/usr/bin/python3');
+  await touch.removeGame('braveleague',()=>{});
+  assert.equal(touch.apps.size,0);
+  console.log('PASS: touch-only game installs artwork and uninstalls without controller discovery');
   const both=setup();
   await both.installGame('pokebonk',()=>{});
   await both.installGame('azeroth',()=>{});

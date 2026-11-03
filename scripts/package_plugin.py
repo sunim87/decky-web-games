@@ -6,7 +6,7 @@ import zipfile
 root = Path(__file__).resolve().parents[1]
 version = json.loads((root / "package.json").read_text())["version"]
 output = root.parent / ("decky-web-games-v" + version + ".zip")
-files = [root / name for name in ["main.py", "installer.py", "updater.py", "plugin.json", "package.json", "README.md", "LICENSE", "CHANGELOG.md"]]
+files = [root / name for name in ["main.py", "installer.py", "updater.py", "display_launcher.py", "plugin.json", "package.json", "README.md", "LICENSE", "CHANGELOG.md"]]
 files += [p for p in (root / "assets").rglob("*") if p.is_file()]
 files += [root / "dist/index.js"]
 with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:

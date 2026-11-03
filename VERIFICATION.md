@@ -54,3 +54,9 @@ D2 Korean follow-up: the game initially used en-US from the new browser profile.
 Game menu UI: physical Steam Deck DOM checks passed for all-collapsed initial state, opening each of the three games, switching the open game, and collapsing it again. Exactly one Install/Uninstall pair is shown for the selected game. Final screenshot confirms both status lines fit on screen.
 
 Updater: 36 Python tests passed, plus simulated update UI checks for new/current/newer installed versions, busy state, download completion and retry. On Steam Deck, the installed plugin queried the public GitHub latest release and its real UI showed up-to-date without a downgrade button. A separate process simulating v1.0.4 downloaded the real public v1.1.0 install ZIP, verified the SHA-256 and ZIP metadata, and saved it directly in `/home/deck/Downloads/`. That test did not change the installed version. The newer-release UI branch was tested with fixtures, not by publishing a test release.
+
+## Brave League local test build
+
+Installed test plugin on Steam Deck; shortcut, all artwork and login/guest screen verified. Initial game fit stayed at 82% after kiosk startup. Explicit --start-fullscreen and --window-size=1280,900 produced a 1280x720 game rect at (0,40) in the 1280x800 viewport after cold launch. Touch gameplay and Google login have not been verified.
+
+Dynamic display launcher follow-up: 39 Python tests passed, plus frontend tests/typecheck/build. Parser and bounds tests cover 1280x800, 1920x1080, 1920x1200, 2560x1600 and portrait orientation, xdpyinfo fallback and failed detection. Steam Deck launched through the Python helper, detected 1280x800, requested initial 1280x928 and rendered the game at (0,40), 1280x720. ROG Ally and Legion Go rendering remain unverified.

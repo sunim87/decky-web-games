@@ -16,6 +16,7 @@ GAMES = {
     "pokebonk": {"name": NAME, "url": "https://pokebonk.com/"},
     "azeroth": {"name": "Azeroth Survivors", "url": "https://wow.aethus.pl/"},
     "d2": {"name": "D2 Survivors", "url": "https://d2survivors.lol/play/"},
+    "braveleague": {"name": "Pokemon Brave League", "url": "https://brave-league.github.io/", "controls": "touch"},
 }
 
 
@@ -60,10 +61,15 @@ def read_shortcuts(data):
 
 def matches(entry, game="pokebonk"):
     info = game_info(game)
+    args = shlex.split(entry.get("LaunchOptions", ""))
+    executable = entry.get("Exe", "").strip('"')
+    launcher = (game == "braveleague" and executable == "/usr/bin/python3" and args
+                and Path(args[0]).is_absolute()
+                and Path(args[0]).as_posix().endswith("/.local/share/decky-pokebonk/braveleague/display_launcher.py"))
     return (entry.get("AppName") == info["name"]
-            and entry.get("Exe", "").strip('"') == "/usr/bin/flatpak"
-            and BRAVE in entry.get("LaunchOptions", "")
-            and info["url"] in shlex.split(entry.get("LaunchOptions", "")))
+            and (executable == "/usr/bin/flatpak" or launcher)
+            and BRAVE in args
+            and info["url"] in args)
 
 
 def atomic_json(path, value):
@@ -161,14 +167,16 @@ class Installer:
         profile = self.browser_profile()
         graphics = ("--enable-unsafe-webgpu --enable-features=Vulkan --use-angle=vulkan --autoplay-policy=no-user-gesture-required "
                     if self.game == "azeroth" else "--enable-features=OverlayScrollbar ")
-        language = "--lang=ko --accept-lang=ko-KR,ko,en-US,en " if self.game == "d2" else ""
-        return ("run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave "
+        language = "--lang=ko --accept-lang=ko-KR,ko,en-US,en " if self.game in {"d2", "braveleague"} else ""
+        if self.game == "braveleague": graphics += "--autoplay-policy=no-user-gesture-required --start-fullscreen "
+        launcher = shlex.quote(str(self.state / "display_launcher.py")) + " " if self.game == "braveleague" else ""
+        return (launcher + "run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave "
                 + BRAVE + " --no-first-run --no-default-browser-check --ozone-platform=x11 --kiosk "
                 + graphics + language +
                 "--user-data-dir=" + shlex.quote(str(profile)) + " " + GAMES[self.game]["url"])
 
     def browser_profile(self):
-        folders = {"azeroth": "azeroth-survivors", "d2": "d2-survivors"}
+        folders = {"azeroth": "azeroth-survivors", "d2": "d2-survivors", "braveleague": "pokemon-brave-league"}
         if self.game not in folders: return None
         return self.home / ".var/app" / BRAVE / "config" / folders[self.game]
 
@@ -219,6 +227,9 @@ class Installer:
         assets.mkdir(exist_ok=True)
         for source in self.assets.glob("*.png"):
             shutil.copy2(source, assets / source.name)
+        if GAMES[self.game].get("controls") == "touch":
+            shutil.copy2(ROOT / "display_launcher.py", self.state / "display_launcher.py")
+            return {"ok": True, "name": self.name, "existing": existing, "icon": str(assets / "icon.png"), "controls": "touch", "exe": "/usr/bin/python3", "home": '"' + str(self.home) + '"', "options": self.launch_options()}
         self.backup_profile(account)
         target = self.profile(account)
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -232,6 +243,9 @@ class Installer:
     async def finish_install(self, account, appid):
         self.account_dir(account)
         if type(appid) is not int or not 0x80000000 <= appid <= 0xffffffff: raise ValueError("올바르지 않은 바로가기 ID입니다.")
+        if GAMES[self.game].get("controls") == "touch":
+            atomic_json(self.manifest(account), {"version": 1, "appid": appid, "controls": "touch"})
+            return {"ok": True}
         profile = self.profile(account)
         if not profile.is_file(): raise ValueError("조작 설정 파일이 없습니다. 설치를 다시 시도하세요.")
         atomic_json(self.manifest(account), {"version": 1, "appid": appid, "profile_sha256": hashlib.sha256(profile.read_bytes()).hexdigest()})
@@ -272,7 +286,7 @@ class Installer:
         if type(appid) is not int or manifest["appid"] != appid: raise ValueError("설치 기록과 제거 대상이 다릅니다.")
         target = self.profile(account)
         marker = self.state / (account + ".profile-backup.json")
-        if target.is_file() and hashlib.sha256(target.read_bytes()).hexdigest() == manifest["profile_sha256"]:
+        if target.is_file() and hashlib.sha256(target.read_bytes()).hexdigest() == manifest.get("profile_sha256"):
             if marker.exists() and json.loads(marker.read_text()).get("existed"):
                 shutil.copy2(self.state / (account + ".controller-backup.vdf"), target)
             else: target.unlink()

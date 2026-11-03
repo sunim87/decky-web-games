@@ -8,9 +8,9 @@ declare const appStore: any;
 declare const ControllerStore: any;
 declare const controllerConfiguratorStore: any;
 
-type Game = "pokebonk" | "azeroth" | "d2";
-const games: {id: Game; name: string}[] = [{id:"pokebonk",name:"Pokebonk Online"},{id:"azeroth",name:"Azeroth Survivors"},{id:"d2",name:"D2 Survivors"}];
-type Reply = {name?: string; ok: boolean; error?: string; message?: string; appid?: number; existing?: number; icon?: string; config?: string; home?: string; options?: string; assets?: {type: number; data: string}[]};
+type Game = "pokebonk" | "azeroth" | "d2" | "braveleague";
+const games: {id: Game; name: string}[] = [{id:"pokebonk",name:"Pokebonk Online"},{id:"azeroth",name:"Azeroth Survivors"},{id:"d2",name:"D2 Survivors"},{id:"braveleague",name:"Pokemon Brave League"}];
+type Reply = {name?: string; ok: boolean; error?: string; message?: string; appid?: number; existing?: number; icon?: string; exe?: string; config?: string; controls?: "touch"; home?: string; options?: string; assets?: {type: number; data: string}[]};
 const prepare = callable<[account: string, game: Game], Reply>("prepare_install");
 const finish = callable<[account: string, appid: number, game: Game], Reply>("finish_install");
 const removal = callable<[account: string, game: Game], Reply>("prepare_remove");
@@ -145,14 +145,14 @@ async function installGame(game: Game, progress: (s: string) => void): Promise<s
   try {
     if (id) assertStopped(id);
     if (!id) {
-      id = (await SteamClient.Apps.AddShortcut(r.name, "/usr/bin/flatpak", "", "")) >>> 0;
+      id = (await SteamClient.Apps.AddShortcut(r.name, r.exe || "/usr/bin/flatpak", "", "")) >>> 0;
       if (!id) throw new Error("Steam 바로가기를 만들지 못했습니다.");
       created = true;
     }
     await waitFor(id, true);
     progress("Steam 바로가기·이미지 등록 중…\nAdding the Steam shortcut and artwork…");
     SteamClient.Apps.SetShortcutName(id, r.name);
-    SteamClient.Apps.SetShortcutExe(id, "/usr/bin/flatpak");
+    SteamClient.Apps.SetShortcutExe(id, r.exe || "/usr/bin/flatpak");
     SteamClient.Apps.SetShortcutStartDir(id, r.home);
     SteamClient.Apps.SetShortcutLaunchOptions(id, r.options);
     SteamClient.Apps.SetShortcutIcon(id, r.icon);
@@ -166,6 +166,10 @@ async function installGame(game: Game, progress: (s: string) => void): Promise<s
     }
     await SteamClient.Apps.SetCustomLogoPositionForApp(id, JSON.stringify({pinnedPosition:"BottomLeft",nWidthPct:45,nHeightPct:60}));
     check(await verifyArtwork(user, id, game));
+    if (r.controls === "touch") {
+      check(await finish(user, id, game));
+      return "설치 완료 · 라이브러리에서 실행 후 화면을 터치하세요.\nInstalled · Launch from your library and use touch controls.";
+    }
     progress("조작 설정을 적용하는 중…\nApplying controller settings…");
     // Save ownership before selecting the config, so a retry can repair partial installs.
     check(await finish(user, id, game));
@@ -221,7 +225,8 @@ function Content() {
   const [statuses, setStatuses] = useState<Record<Game,string>>({
     pokebonk:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
     azeroth:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
-    d2:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required"
+    d2:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
+    braveleague:"터치 조작 권장 · 인터넷 연결 필요\nTouch controls recommended · Internet required"
   });
   const run = async (game: Game, action: typeof installGame) => {
     if (running.current) return;

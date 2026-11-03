@@ -150,3 +150,34 @@ class MultiGameTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(matches(item,'pokebonk'))
         for role in ['capsule','wide','hero','logo','icon']:
             self.assertTrue((d2.assets/(role+'.png')).is_file())
+
+
+class BraveLeagueTests(unittest.IsolatedAsyncioTestCase):
+    setUp = MultiGameTests.setUp
+    tearDown = MultiGameTests.tearDown
+    async def test_touch_profile_install_remove_preserves_saves_and_other_games(self):
+        touch = Installer(self.home, game='braveleague')
+        touch.ensure_brave = AsyncMock()
+        old_profile = touch.profile('123')
+        old_profile.parent.mkdir(parents=True, exist_ok=True)
+        old_profile.write_text('custom controller profile')
+        reply = await touch.prepare_install('123')
+        self.assertEqual(reply['controls'], 'touch')
+        self.assertEqual(reply['exe'], '/usr/bin/python3')
+        self.assertTrue((touch.state / 'display_launcher.py').is_file())
+        item = entry(AppName=touch.name, Exe=reply['exe'], LaunchOptions=reply['options'])
+        self.assertTrue(matches(item, 'braveleague'))
+        self.assertFalse(matches(item, 'd2'))
+        self.assertNotIn('config', reply)
+        self.assertNotIn('--enable-unsafe-webgpu', reply['options'])
+        self.assertIn('https://brave-league.github.io/', shlex.split(reply['options']))
+        self.assertIn('pokemon-brave-league', reply['options'])
+        save = touch.browser_profile() / 'saved-progress'
+        save.write_text('keep this save')
+        await touch.finish_install('123', 0x80000004)
+        self.assertNotIn('profile_sha256', json.loads(touch.manifest('123').read_text()))
+        await touch.finish_remove('123', 0x80000004)
+        self.assertEqual(save.read_text(), 'keep this save')
+        self.assertEqual(old_profile.read_text(), 'custom controller profile')
+        self.assertNotEqual(touch.browser_profile(), self.az.browser_profile())
+        self.assertFalse(matches(entry(), 'braveleague'))

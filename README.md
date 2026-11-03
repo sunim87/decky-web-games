@@ -7,17 +7,18 @@ SteamOS 휴대용 기기를 위한 웹게임 설치·제거 플러그인 / Web g
 
 ## 한국어
 
-**Pokebonk Online**, **Azeroth Survivors**, **D2 Survivors**를 게임별 **Install / Uninstall** 버튼으로 관리합니다. Install을 누르면 Brave 브라우저 준비, Steam 바로가기, 네이티브 게임패드 설정과 라이브러리 이미지 등록을 진행합니다. 인터넷 연결이 필요합니다.
+**Pokebonk Online**, **Azeroth Survivors**, **D2 Survivors**, **Pokemon Brave League**를 게임별 **Install / Uninstall** 버튼으로 관리합니다. Install을 누르면 Brave 브라우저 준비, Steam 바로가기, 지원 게임의 네이티브 게임패드 설정과 라이브러리 이미지 등록을 진행합니다. 인터넷 연결이 필요합니다.
 
 | 게임 | 공식 사이트 | 실행 방식 |
 | --- | --- | --- |
 | Pokebonk Online | https://pokebonk.com/ | Brave 전체화면 |
 | Azeroth Survivors | https://wow.aethus.pl/ | 전용 Brave 프로필 · WebGPU/Vulkan |
 | D2 Survivors | https://d2survivors.lol/play/ | 전용 Brave 프로필 · 한국어 기본 실행 |
+| Pokemon Brave League | https://brave-league.github.io/ | 터치 조작 권장 · 전용 프로필 · 해상도 자동 감지 |
 
 ### 설치
 
-1. [릴리스 페이지](https://github.com/sunim87/decky-web-games/releases/latest)에서 **decky-web-games-v1.1.2.zip**을 다운로드합니다. `-source.zip`은 소스 코드 보관용입니다.
+1. [릴리스 페이지](https://github.com/sunim87/decky-web-games/releases/latest)에서 **decky-web-games-v1.1.3.zip**을 다운로드합니다. `-source.zip`은 소스 코드 보관용입니다.
 2. Decky Loader 설정의 개발자 메뉴에서 ZIP 설치 기능으로 설치합니다.
 3. Decky에서 **Decky Web Games**를 열고 원하는 게임의 **Install**을 누릅니다.
 4. Steam 라이브러리에서 해당 게임을 실행합니다.
@@ -26,7 +27,7 @@ SteamOS 휴대용 기기를 위한 웹게임 설치·제거 플러그인 / Web g
 
 ### 조작 및 실행
 
-연결된 Steam Deck, Xbox 계열, 일반 게임패드 및 DualSense 계열 컨트롤러를 Steam의 여러 정보 경로에서 찾고 네이티브 게임패드 설정을 적용합니다. 알려지지 않은 게임패드 유형은 기본 Xbox 게임패드 템플릿의 변환을 시도합니다. ROG Ally·Legion Go가 Xbox 또는 DualSense로 인식되는 환경도 처리합니다. 내장 컨트롤러는 게임패드 모드로 켜 주세요. 게임패드 식별에 필요한 `/run/udev` 읽기 권한도 실행 옵션에 포함합니다. 게임 화면이 활성화된 상태에서 버튼을 한 번 누르세요.
+게임패드 지원 게임에서는 연결된 Steam Deck, Xbox 계열, 일반 게임패드 및 DualSense 계열 컨트롤러를 Steam의 여러 정보 경로에서 찾고 네이티브 게임패드 설정을 적용합니다. 알려지지 않은 게임패드 유형은 기본 Xbox 게임패드 템플릿의 변환을 시도합니다. ROG Ally·Legion Go가 Xbox 또는 DualSense로 인식되는 환경도 처리합니다. 내장 컨트롤러는 게임패드 모드로 켜 주세요. 게임패드 식별에 필요한 `/run/udev` 읽기 권한도 실행 옵션에 포함합니다. 게임 화면이 활성화된 상태에서 버튼을 한 번 누르세요.
 
 컨트롤러 감지나 자동 설정 확인이 안 되어도 바로가기·이미지 설치는 완료하며, 이 경우 패드 자동 설정 미확인 안내를 표시합니다. 게임 실행 후 패드가 동작하지 않으면 Steam의 게임별 조작 설정에서 게임패드 템플릿을 선택해 주세요.
 
@@ -44,9 +45,9 @@ Decky에서 플러그인만 삭제하면 게임 바로가기는 남습니다. �
 
 ## English
 
-Install and uninstall **Pokebonk Online**, **Azeroth Survivors** and **D2 Survivors** from Decky. Each game has its own buttons, Steam shortcut, native gamepad setup and five library images. Games load directly from their creators' websites and require internet access.
+Install and uninstall **Pokebonk Online**, **Azeroth Survivors** **D2 Survivors** and **Pokemon Brave League** from Decky. Each game has its own buttons, Steam shortcut and five library images. Brave League uses touch controls without changing controller templates; the other games use native gamepad setup. Games load directly from their creators' websites and require internet access.
 
-Download **decky-web-games-v1.1.2.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
+Download **decky-web-games-v1.1.3.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
 
 Brave is reused or installed from Flathub. Azeroth uses a dedicated profile with Linux WebGPU/Vulkan options and read-only `/run/udev` access. Its P3A notice is disabled in that dedicated profile. Browser sandboxing and certificate checks stay enabled.
 
@@ -54,7 +55,7 @@ Close the game before pressing **Uninstall**. Only the managed shortcut and libr
 
 ## Validation
 
-- 36 Python regression tests, frontend installation/rollback tests, typecheck and build passed.
+- 39 Python regression tests, frontend installation/rollback tests, typecheck and build passed.
 - Physical Steam Deck Gaming Mode launch, AMD RDNA 2 WebGPU initialization, artwork, native gamepad selection and user-confirmed controls were tested.
 - Uninstall/reinstall preserved the browser profile and local storage hashes; existing Pokebonk stayed available.
 - Brave first-run infobar fix was verified after relaunch.
@@ -78,7 +79,7 @@ The install ZIP retains the existing `decky-pokebonk/` plugin directory and pers
 
 ## Credits and license
 
-PokéBonk is by Charcher; Azeroth Survivors is by Aethus; D2 Survivors is by framara. This plugin opens their official sites and does not redistribute game code or unlocked offline builds. Generated library artwork is fan artwork, not an official game screenshot. The Pokebonk PB icon originates from the game's bundled icon; the controller template is based on Steam's standard gamepad template.
+PokéBonk is by Charcher; Azeroth Survivors is by Aethus; D2 Survivors is by framara. This plugin opens their official sites and does not redistribute game code or unlocked offline builds. Generated library artwork is fan artwork, not an official game screenshot. Brave League library artwork uses its official site background, logo and app icon. The Pokebonk PB icon originates from the game's bundled icon; the controller template is based on Steam's standard gamepad template.
 
 Plugin code is [MIT licensed](LICENSE); this does not grant rights to game characters, artwork or trademarks. Unofficial community project, not affiliated with the game developers, Valve, Blizzard Entertainment, Nintendo, GAME FREAK, Creatures or The Pokémon Company.
 
@@ -87,3 +88,11 @@ Plugin code is [MIT licensed](LICENSE); this does not grant rights to game chara
 **Check for Updates** checks the latest public stable GitHub release. A newer release shows its version and a **Download** button. The ZIP is saved directly to `~/Downloads/`, verified against GitHub’s SHA-256 digest and plugin/version metadata, and is not installed automatically. Install the downloaded ZIP through Decky. Current or newer installed builds show an up-to-date message; test builds are not downgraded. Requests run only when you press a button.
 
 업데이트 확인 버튼으로 새 공개 버전을 확인하고, 새 버전이 있으면 다운로드 버튼을 표시합니다. ZIP은 **다운로드 폴더 바로 아래**에 저장합니다. 다운로드한 ZIP은 Decky의 ZIP 설치로 적용할 수 있습니다.
+
+## Pokemon Brave League
+
+공식 웹게임 https://brave-league.github.io/ 을 터치 조작용으로 추가했습니다. 게임패드 템플릿은 변경하지 않으며, 전용 Brave 프로필에 로그인·저장 데이터를 보관합니다. 제거해도 프로필은 유지됩니다. 라이브러리 이미지는 공식 사이트의 배경·로고·앱 아이콘을 조합한 것으로 AI 생성 이미지가 아닙니다. 스팀덱에서 설치·실행·화면 크기 및 이미지 등록을 확인했습니다. 실제 터치 플레이와 Google 로그인은 아직 검증하지 않았습니다.
+
+브레이브 리그는 매 실행 시 Steam/Gamescope의 현재 화면 해상도를 감지해 시작 창 크기를 정합니다. 해상도 감지가 불가능하면 1280×800을 기준으로 실행합니다. 16:9 게임 비율을 유지하므로 화면 비율에 따라 여백이 남을 수 있습니다.
+
+라이브러리 이미지의 색상 수를 최적화해 설치 ZIP을 약 21.8MB에서 5.8MB로 줄였습니다. 해상도와 투명 배경은 유지하며 색상에 미세한 차이가 있을 수 있습니다. 기존 게임의 이미지도 갱신하려면 게임을 종료하고 각 게임의 Install을 다시 눌러 주세요.
