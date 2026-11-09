@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.4
+
+- Add the official Pokebonk Linux app with verified download, Steam registration and its own library artwork.
+- Rename the web entry in the plugin to Pokebonk Online Web.
+- Preserve saves when uninstalling the managed app.
+
 ## 1.1.3
 
 - Compress library artwork using 256-color PNG palettes; retain pixel dimensions and transparency.

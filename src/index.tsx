@@ -8,8 +8,8 @@ declare const appStore: any;
 declare const ControllerStore: any;
 declare const controllerConfiguratorStore: any;
 
-type Game = "pokebonk" | "azeroth" | "d2" | "braveleague";
-const games: {id: Game; name: string}[] = [{id:"pokebonk",name:"Pokebonk Online"},{id:"azeroth",name:"Azeroth Survivors"},{id:"d2",name:"D2 Survivors"},{id:"braveleague",name:"Pokemon Brave League"}];
+type Game = "official" | "pokebonk" | "azeroth" | "d2" | "braveleague";
+const games: {id: Game; name: string}[] = [{id:"pokebonk",name:"Pokebonk Online Web"},{id:"official",name:"Pokebonk Official App"},{id:"azeroth",name:"Azeroth Survivors"},{id:"d2",name:"D2 Survivors"},{id:"braveleague",name:"Pokemon Brave League"}];
 type Reply = {name?: string; ok: boolean; error?: string; message?: string; appid?: number; existing?: number; icon?: string; exe?: string; config?: string; controls?: "touch"; home?: string; options?: string; assets?: {type: number; data: string}[]};
 const prepare = callable<[account: string, game: Game], Reply>("prepare_install");
 const finish = callable<[account: string, appid: number, game: Game], Reply>("finish_install");
@@ -137,7 +137,7 @@ async function connectedGamepads(): Promise<{index: number; template: string}[]>
 
 async function installGame(game: Game, progress: (s: string) => void): Promise<string> {
   const user = account();
-  progress("Brave와 설치 파일 준비 중…\nPreparing Brave and installation files…");
+  progress(game === "official" ? "공식 Linux 앱 다운로드 및 설치 중…\nDownloading and installing the official Linux app…" : "Brave와 설치 파일 준비 중…\nPreparing Brave and installation files…");
   const r = check(await prepare(user, game));
   let id = r.existing || 0;
   if (id && !appStore.GetAppOverviewByAppID(id)) id = 0;
@@ -214,6 +214,7 @@ async function removeGame(game: Game, progress: (s: string) => void) {
   SteamClient.Apps.RemoveShortcut(id);
   await waitFor(id, false);
   check(await clean(user, id, game));
+  if (game === "official") return "제거 완료 · 저장 데이터 보존\nUninstalled · Save data kept.";
   return "제거 완료 · Brave와 저장 데이터 보존\nUninstalled · Brave and saves kept.";
 }
 function Content() {
@@ -223,6 +224,7 @@ function Content() {
   const [updateStatus, setUpdateStatus] = useState("");
   const running = useRef(false);
   const [statuses, setStatuses] = useState<Record<Game,string>>({
+    official:"공식 Linux 앱 · 인터넷 연결 필요\nOfficial Linux app · Internet required",
     pokebonk:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
     azeroth:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
     d2:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",

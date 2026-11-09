@@ -7,12 +7,14 @@ import re
 import shutil
 import struct
 import shlex
+import official_app
 
 ROOT = Path(__file__).resolve().parent
 NAME = "Pokebonk Online"
 BRAVE = "com.brave.Browser"
 OPTIONS = "run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave com.brave.Browser --no-first-run --no-default-browser-check --ozone-platform=x11 --kiosk --force-device-scale-factor=1.25 --enable-features=OverlayScrollbar https://pokebonk.com/"
 GAMES = {
+    "official": {"name": "Pokebonk Official App", "url": "https://pokebonk.com/"},
     "pokebonk": {"name": NAME, "url": "https://pokebonk.com/"},
     "azeroth": {"name": "Azeroth Survivors", "url": "https://wow.aethus.pl/"},
     "d2": {"name": "D2 Survivors", "url": "https://d2survivors.lol/play/"},
@@ -59,8 +61,17 @@ def read_shortcuts(data):
     return list(obj().get("shortcuts", {}).values())
 
 
-def matches(entry, game="pokebonk"):
+def matches(entry, game="pokebonk", home=None):
     info = game_info(game)
+    if game == "official":
+        base = Path(home or Path.home())
+        targets = {
+            base / ".local/share/decky-pokebonk/official/native/launch.sh",
+            base / "Applications/pokebonk-official/launch.sh",
+        }
+        return (entry.get("AppName") == info["name"]
+                and Path(entry.get("Exe", "").strip('"')) in targets
+                and not entry.get("LaunchOptions", "").strip())
     args = shlex.split(entry.get("LaunchOptions", ""))
     executable = entry.get("Exe", "").strip('"')
     launcher = (game == "braveleague" and executable == "/usr/bin/python3" and args
@@ -112,7 +123,7 @@ class Installer:
 
     def find_existing(self, account):
         named = [e for e in self.entries(account) if e.get("AppName") == self.name]
-        if any(not matches(e, self.game) for e in named):
+        if any(not matches(e, self.game, self.home) for e in named):
             raise ValueError("같은 이름의 다른 바로가기가 있습니다. 이름을 변경한 뒤 설치하세요.")
         if len(named) > 1: raise ValueError("동일한 게임 바로가기가 여러 개 있습니다. 중복을 정리한 뒤 시도하세요.")
         return named[0].get("appid") if named else None
@@ -215,18 +226,25 @@ class Installer:
         if old.exists():
             managed = json.loads(old.read_text())
             if existing and existing != managed["appid"]: raise RuntimeError("기존 설치 기록과 바로가기가 다릅니다.")
-            if any(e.get("appid") == managed["appid"] and not matches(e, self.game) for e in self.entries(account)):
+            if any(e.get("appid") == managed["appid"] and not matches(e, self.game, self.home) for e in self.entries(account)):
                 raise RuntimeError("기존 설치 기록과 바로가기가 다릅니다.")
             existing = existing or managed["appid"]
         if existing: self.assert_stopped(existing)
         if any(not (self.assets / (role + ".png")).is_file() for role in ("capsule", "wide", "hero", "logo", "icon")):
             raise RuntimeError("이미지 파일을 읽을 수 없습니다.")
-        await self.ensure_brave()
-        self.configure_browser_profile()
+        if self.game == "official":
+            launcher = await asyncio.to_thread(official_app.install, self.state / "native")
+        else:
+            await self.ensure_brave()
+            self.configure_browser_profile()
         assets = self.state / "assets"
         assets.mkdir(exist_ok=True)
         for source in self.assets.glob("*.png"):
             shutil.copy2(source, assets / source.name)
+        if self.game == "official":
+            return {"ok": True, "name": self.name, "existing": existing,
+                    "icon": str(assets / "icon.png"), "exe": str(launcher),
+                    "home": '"' + str(launcher.parent) + '"', "options": ""}
         if GAMES[self.game].get("controls") == "touch":
             shutil.copy2(ROOT / "display_launcher.py", self.state / "display_launcher.py")
             return {"ok": True, "name": self.name, "existing": existing, "icon": str(assets / "icon.png"), "controls": "touch", "exe": "/usr/bin/python3", "home": '"' + str(self.home) + '"', "options": self.launch_options()}
@@ -245,6 +263,9 @@ class Installer:
         if type(appid) is not int or not 0x80000000 <= appid <= 0xffffffff: raise ValueError("올바르지 않은 바로가기 ID입니다.")
         if GAMES[self.game].get("controls") == "touch":
             atomic_json(self.manifest(account), {"version": 1, "appid": appid, "controls": "touch"})
+            return {"ok": True}
+        if self.game == "official":
+            atomic_json(self.manifest(account), {"version": 1, "appid": appid})
             return {"ok": True}
         profile = self.profile(account)
         if not profile.is_file(): raise ValueError("조작 설정 파일이 없습니다. 설치를 다시 시도하세요.")
@@ -273,7 +294,7 @@ class Installer:
         manifest = json.loads(p.read_text())
         self.assert_stopped(manifest["appid"])
         for entry in self.entries(account):
-            if entry.get("appid") == manifest["appid"] and not matches(entry, self.game):
+            if entry.get("appid") == manifest["appid"] and not matches(entry, self.game, self.home):
                 raise RuntimeError("바로가기 내용이 변경되어 자동 제거를 중단했습니다.")
             if entry.get("appid") == manifest["appid"] and entry.get("FlatpakAppID"):
                 raise RuntimeError("기존 바로가기에 Brave 자동 제거 연결 정보가 있습니다. 브라우저 보호를 위해 자동 제거를 중단했습니다.")
@@ -284,6 +305,14 @@ class Installer:
         if not p.exists(): return {"ok": True}
         manifest = json.loads(p.read_text())
         if type(appid) is not int or manifest["appid"] != appid: raise ValueError("설치 기록과 제거 대상이 다릅니다.")
+        if self.game == "official":
+            self.assert_stopped(appid)
+            others = [record for record in self.state.glob("*.json") if record != p and record.stem.isdecimal()]
+            native = self.state / "native"
+            if not others and native.exists():
+                shutil.rmtree(native)
+            p.unlink()
+            return {"ok": True}
         target = self.profile(account)
         marker = self.state / (account + ".profile-backup.json")
         if target.is_file() and hashlib.sha256(target.read_bytes()).hexdigest() == manifest.get("profile_sha256"):
