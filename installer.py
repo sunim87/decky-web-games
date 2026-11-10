@@ -14,6 +14,7 @@ NAME = "Pokebonk Online"
 BRAVE = "com.brave.Browser"
 OPTIONS = "run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave com.brave.Browser --no-first-run --no-default-browser-check --ozone-platform=x11 --kiosk --force-device-scale-factor=1.25 --enable-features=OverlayScrollbar https://pokebonk.com/"
 GAMES = {
+    "pokerogue": {"name": "PokéRogue", "url": "https://pokerogue.net/"},
     "official": {"name": "Pokebonk Official App", "url": "https://pokebonk.com/"},
     "pokebonk": {"name": NAME, "url": "https://pokebonk.com/"},
     "azeroth": {"name": "Azeroth Survivors", "url": "https://wow.aethus.pl/"},
@@ -178,7 +179,7 @@ class Installer:
         profile = self.browser_profile()
         graphics = ("--enable-unsafe-webgpu --enable-features=Vulkan --use-angle=vulkan --autoplay-policy=no-user-gesture-required "
                     if self.game == "azeroth" else "--enable-features=OverlayScrollbar ")
-        language = "--lang=ko --accept-lang=ko-KR,ko,en-US,en " if self.game in {"d2", "braveleague"} else ""
+        language = "--lang=ko --accept-lang=ko-KR,ko,en-US,en " if self.game in {"d2", "braveleague", "pokerogue"} else ""
         if self.game == "braveleague": graphics += "--autoplay-policy=no-user-gesture-required --start-fullscreen "
         launcher = shlex.quote(str(self.state / "display_launcher.py")) + " " if self.game == "braveleague" else ""
         return (launcher + "run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave "
@@ -187,7 +188,7 @@ class Installer:
                 "--user-data-dir=" + shlex.quote(str(profile)) + " " + GAMES[self.game]["url"])
 
     def browser_profile(self):
-        folders = {"azeroth": "azeroth-survivors", "d2": "d2-survivors", "braveleague": "pokemon-brave-league"}
+        folders = {"pokerogue": "pokerogue", "azeroth": "azeroth-survivors", "d2": "d2-survivors", "braveleague": "pokemon-brave-league"}
         if self.game not in folders: return None
         return self.home / ".var/app" / BRAVE / "config" / folders[self.game]
 

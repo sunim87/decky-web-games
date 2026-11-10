@@ -8,8 +8,8 @@ declare const appStore: any;
 declare const ControllerStore: any;
 declare const controllerConfiguratorStore: any;
 
-type Game = "official" | "pokebonk" | "azeroth" | "d2" | "braveleague";
-const games: {id: Game; name: string}[] = [{id:"pokebonk",name:"Pokebonk Online Web"},{id:"official",name:"Pokebonk Official App"},{id:"azeroth",name:"Azeroth Survivors"},{id:"d2",name:"D2 Survivors"},{id:"braveleague",name:"Pokemon Brave League"}];
+type Game = "pokerogue" | "official" | "pokebonk" | "azeroth" | "d2" | "braveleague";
+const games: {id: Game; name: string}[] = [{id:"pokebonk",name:"Pokebonk Online Web"},{id:"official",name:"Pokebonk Official App"},{id:"azeroth",name:"Azeroth Survivors"},{id:"d2",name:"D2 Survivors"},{id:"pokerogue",name:"PokéRogue"},{id:"braveleague",name:"Pokemon Brave League"}];
 type Reply = {name?: string; ok: boolean; error?: string; message?: string; appid?: number; existing?: number; icon?: string; exe?: string; config?: string; controls?: "touch"; home?: string; options?: string; assets?: {type: number; data: string}[]};
 const prepare = callable<[account: string, game: Game], Reply>("prepare_install");
 const finish = callable<[account: string, appid: number, game: Game], Reply>("finish_install");
@@ -228,6 +228,7 @@ function Content() {
     pokebonk:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
     azeroth:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
     d2:"공식 웹게임 · 인터넷 연결 필요\nOfficial web game · Internet required",
+    pokerogue:"한국어 지원 · 인터넷 연결 필요\nKorean available · Internet required",
     braveleague:"터치 조작 권장 · 인터넷 연결 필요\nTouch controls recommended · Internet required"
   });
   const run = async (game: Game, action: typeof installGame) => {

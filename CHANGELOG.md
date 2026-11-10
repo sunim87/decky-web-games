@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.5
+
+- Add PokéRogue with a dedicated browser profile, Korean language preference, gamepad setup and Steam artwork.
+
 ## 1.1.4
 
 - Add the official Pokebonk Linux app with verified download, Steam registration and its own library artwork.
