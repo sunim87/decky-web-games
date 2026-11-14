@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.6
+
+- Add Need for Speed Underground 2 Revived.
+
 ## 1.1.5
 
 - Add PokéRogue with a dedicated browser profile, Korean language preference, gamepad setup and Steam artwork.
