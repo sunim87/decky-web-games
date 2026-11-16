@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.7
+
+- Add Kanto Tactics with touch controls and Steam library artwork.
+
 ## 1.1.6
 
 - Add Need for Speed Underground 2 Revived.

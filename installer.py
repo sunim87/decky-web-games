@@ -14,6 +14,7 @@ NAME = "Pokebonk Online"
 BRAVE = "com.brave.Browser"
 OPTIONS = "run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave com.brave.Browser --no-first-run --no-default-browser-check --ozone-platform=x11 --kiosk --force-device-scale-factor=1.25 --enable-features=OverlayScrollbar https://pokebonk.com/"
 GAMES = {
+    "kantotactics": {"name": "Kanto Tactics", "url": "https://einoow.com/playables/kanto-tactics/index.html", "controls": "touch"},
     "underground2": {"name": "Need for Speed Underground 2 Revived", "url": "https://nfsu2.virtualis.cl/"},
     "pokerogue": {"name": "PokéRogue", "url": "https://pokerogue.net/"},
     "official": {"name": "Pokebonk Official App", "url": "https://pokebonk.com/"},
@@ -76,9 +77,9 @@ def matches(entry, game="pokebonk", home=None):
                 and not entry.get("LaunchOptions", "").strip())
     args = shlex.split(entry.get("LaunchOptions", ""))
     executable = entry.get("Exe", "").strip('"')
-    launcher = (game == "braveleague" and executable == "/usr/bin/python3" and args
+    launcher = (info.get("controls") == "touch" and executable == "/usr/bin/python3" and args
                 and Path(args[0]).is_absolute()
-                and Path(args[0]).as_posix().endswith("/.local/share/decky-pokebonk/braveleague/display_launcher.py"))
+                and Path(args[0]).as_posix().endswith(f"/.local/share/decky-pokebonk/{game}/display_launcher.py"))
     return (entry.get("AppName") == info["name"]
             and (executable == "/usr/bin/flatpak" or launcher)
             and BRAVE in args
@@ -181,15 +182,15 @@ class Installer:
         graphics = ("--enable-unsafe-webgpu --enable-features=Vulkan --use-angle=vulkan --autoplay-policy=no-user-gesture-required "
                     if self.game in {"azeroth", "underground2"} else "--enable-features=OverlayScrollbar ")
         language = "--lang=ko --accept-lang=ko-KR,ko,en-US,en " if self.game in {"d2", "braveleague", "pokerogue"} else ""
-        if self.game == "braveleague": graphics += "--autoplay-policy=no-user-gesture-required --start-fullscreen "
-        launcher = shlex.quote(str(self.state / "display_launcher.py")) + " " if self.game == "braveleague" else ""
+        if GAMES[self.game].get("controls") == "touch": graphics += "--autoplay-policy=no-user-gesture-required --start-fullscreen "
+        launcher = shlex.quote(str(self.state / "display_launcher.py")) + " " if GAMES[self.game].get("controls") == "touch" else ""
         return (launcher + "run --branch=stable --arch=x86_64 --filesystem=/run/udev:ro --command=brave "
                 + BRAVE + " --no-first-run --no-default-browser-check --ozone-platform=x11 --kiosk "
                 + graphics + language +
                 "--user-data-dir=" + shlex.quote(str(profile)) + " " + GAMES[self.game]["url"])
 
     def browser_profile(self):
-        folders = {"underground2": "underground-2-revived", "pokerogue": "pokerogue", "azeroth": "azeroth-survivors", "d2": "d2-survivors", "braveleague": "pokemon-brave-league"}
+        folders = {"kantotactics": "kanto-tactics", "underground2": "underground-2-revived", "pokerogue": "pokerogue", "azeroth": "azeroth-survivors", "d2": "d2-survivors", "braveleague": "pokemon-brave-league"}
         if self.game not in folders: return None
         return self.home / ".var/app" / BRAVE / "config" / folders[self.game]
 

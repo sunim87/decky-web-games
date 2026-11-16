@@ -15,6 +15,7 @@ SteamOS 휴대용 기기를 위한 웹게임 설치·제거 플러그인 / Web g
 | Azeroth Survivors | https://wow.aethus.pl/ | 전용 Brave 프로필 · WebGPU/Vulkan |
 | D2 Survivors | https://d2survivors.lol/play/ | 전용 Brave 프로필 · 한국어 기본 실행 |
 | Pokemon Brave League | https://brave-league.github.io/ | 터치 조작 권장 · 전용 프로필 · 해상도 자동 감지 |
+| Kanto Tactics | https://einoow.com/kanto-tactics | 터치 조작 권장 · 전용 프로필 · 해상도 자동 감지 |
 
 ### 설치
 
@@ -45,7 +46,7 @@ Decky에서 플러그인만 삭제하면 게임 바로가기는 남습니다. �
 
 ## English
 
-Install and uninstall **Pokebonk Online**, **Azeroth Survivors** **D2 Survivors** and **Pokemon Brave League** from Decky. Each game has its own buttons, Steam shortcut and five library images. Brave League uses touch controls without changing controller templates; the other games use native gamepad setup. Games load directly from their creators' websites and require internet access.
+Install and uninstall **Pokebonk Online**, **Azeroth Survivors** **D2 Survivors** and **Pokemon Brave League** from Decky. Each game has its own buttons, Steam shortcut and five library images. Brave League and Kanto Tactics use touch controls without changing controller templates. Games load directly from their creators' websites and require internet access.
 
 Download **decky-web-games-v1.1.3.zip** from [Releases](https://github.com/sunim87/decky-web-games/releases/latest), install it through Decky's ZIP installer, open **Decky Web Games**, and press the game's **Install** button. Launch it from the Steam library.
 
